@@ -1,5 +1,8 @@
+'use client'
+
 import Link from 'next/link'
 import { Trophy, Home, ArrowLeft } from 'lucide-react'
+
 
 export default function NotFound() {
   return (
