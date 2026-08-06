@@ -21,10 +21,12 @@
 
 name: Deploy
 
-on:
-  push:
-    branches:
-      - main
+# DISABLED - Manual deployment only
+# Comment out the 'on' section to disable automatic triggers
+# on:
+#   push:
+#     branches:
+#       - main
 
 jobs:
   # ----------------------------------------------------------------------------
@@ -33,6 +35,8 @@ jobs:
   migrate:
     name: Run Database Migrations
     runs-on: ubuntu-latest
+    # Disabled - remove this line to enable
+    if: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -57,6 +61,8 @@ jobs:
     name: Deploy to Cloudflare Workers
     needs: migrate
     runs-on: ubuntu-latest
+    # Disabled - remove this line to enable
+    if: false
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
