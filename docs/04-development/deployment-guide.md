@@ -1,12 +1,12 @@
-# 🚀 Deployment Guide — Cloudflare Pages & Supabase
+# 🚀 Deployment Guide — Cloudflare Workers & Supabase
 
-> **Hướng Dẫn Triển Khai Sản Phẩm**: Các bước cài đặt, cấu hình biến môi trường và deploy lên Cloudflare Pages & Supabase (0$/tháng commercial).
+> **Hướng Dẫn Triển Khai Sản Phẩm**: Quy trình build OpenNext v1.20, cấu hình biến môi trường và deploy lên Cloudflare Workers (0$/tháng commercial) & Supabase PostgreSQL.
 
 ---
 
 ## 🛠️ 1. Chuẩn Bị Biến Môi Trường (Environment Variables)
 
-Tạo tệp `.env.local` hoặc cấu hình trong **Cloudflare Pages Environment Variables**:
+Tạo tệp `.env.local` cho môi trường Local Dev & cấu hình trên Cloudflare Workers Dashboard:
 
 ```env
 # Supabase Configuration
@@ -19,38 +19,37 @@ STRAVA_CLIENT_ID=12345
 STRAVA_CLIENT_SECRET=abcdef1234567890
 STRAVA_VERIFY_TOKEN=your_custom_webhook_secret_token
 
-# App Configuration
-NEXT_PUBLIC_APP_URL=https://strava-ranking.pages.dev
+# Application URL & Auth Secret
+NEXT_PUBLIC_APP_URL=https://kmtracker.dev-haucx.workers.dev
+SESSION_SECRET=your_custom_hmac_sha256_secret_key
 ```
 
 ---
 
-## 📦 2. Các Bước Triển Khai Lên Cloudflare Pages
+## 📦 2. Các Bước Biên Dịch & Triển Khai Worker
 
-1. **Cài đặt Wrangler CLI**:
+1. **Biên dịch OpenNext Cloudflare Worker**:
    ```bash
-   npm install -g wrangler
+   npm run build:worker
    ```
+   *Lưu ý: Lệnh này kích hoạt `@opennextjs/cloudflare build` tạo gói Worker tối ưu trong `.open-next/worker.js`.*
 
-2. **Đăng nhập Cloudflare**:
+2. **Triển khai lên Cloudflare Workers với API Token**:
    ```bash
-   npx wrangler login
-   ```
-
-3. **Biên dịch dự án**:
-   ```bash
-   npm run build
-   ```
-
-4. **Triển khai sản phẩm**:
-   ```bash
-   npx wrangler pages deploy .open-next/assets --project-name=strava-ranking
+   CLOUDFLARE_API_TOKEN=cfut_... npx wrangler deploy
    ```
 
 ---
 
-## 🗄️ 3. Thiết Lập PostgreSQL trên Supabase
+## 🗄️ 3. Thiết Lập Cơ Sở Dữ Liệu Supabase PostgreSQL
 
-1. Mở Supabase Project SQL Editor.
-2. Thực thi tệp `docs/03-architecture/erd.md` để khởi tạo toàn bộ schema, indexes và RLS Policies.
-3. Tạo tài khoản Admin ban đầu trong `auth.users` và set `role = 'admin'` trong `user_profiles`.
+1. Đăng nhập Supabase Console và mở **SQL Editor**.
+2. Thực thi tuần tự các tệp Migration từ `supabase/migrations/`:
+   - `001_initial_schema.sql` (Tables & RLS)
+   - `002_departments.sql`
+   - `003_activities_converted.sql`
+   - `004_admin_roles.sql`
+   - `005_audit_logs.sql`
+   - `006_rule_modifications.sql`
+   - `007_soft_delete_and_competitions.sql`
+3. Cấu hình tài khoản Admin trong `user_profiles` với `role = 'admin'` hoặc `'super_admin'`.

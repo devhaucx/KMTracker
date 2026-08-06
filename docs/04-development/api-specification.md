@@ -1,13 +1,14 @@
-# 🔌 API Specification — Strava Ranking Platform
+# 🔌 API Specification — KM Tracker Platform
 
-> **Đặc tả Giao diện Lập trình Ứng dụng (API Spec)**: Các endpoint OAuth 2.0, Webhook tiếp nhận dữ liệu và API xử lý đối soát.
+> **Đặc tả Giao diện Lập trình Ứng dụng (API Spec)**: Các endpoint Auth 2.0, Webhook tiếp nhận dữ liệu và API xử lý đối soát.
 
 ---
 
-## 🔑 1. Authenticated Strava OAuth Endpoints
+## 🔑 1. Authenticated Auth & OAuth Endpoints
 
 ### `GET /api/auth/strava`
 - **Mục đích**: Khởi tạo luồng đăng nhập Strava OAuth 2.0.
+- **Header Handling**: Kiểm tra `purpose === 'prefetch'` hoặc `x-middleware-prefetch` → Trả về `HTTP 204 No Content` để tránh lỗi CORS background fetch trong Next.js.
 - **Query Params**:
   - `invite_code` (optional): Mã cuộc thi muốn gia nhập sau khi auth.
 - **Flow**: Redirect người dùng sang `https://www.strava.com/oauth/authorize?client_id=...&response_type=code&scope=read,activity:read_all`.
@@ -17,7 +18,16 @@
 - **Query Params**:
   - `code`: Authorization code từ Strava.
   - `scope`: Quyền được cấp.
-- **Response**: Set cookie phiên đăng nhập và redirect về `/dashboard` hoặc `/join/[code]`.
+- **Flow**:
+  1. Tráo đổi `code` lấy `access_token`, `refresh_token`, và `athlete_id`.
+  2. Tạo/Cập nhật hồ sơ VĐV trong bảng `users` & `user_profiles`.
+  3. Tạo session token HMAC-SHA256 lưu trong cookie `tm_session` (Strict HttpOnly, SameSite=Lax).
+  4. Sử dụng `getAppUrl(request)` tự động nhận diện domain sản xuất (`https://kmtracker.dev-haucx.workers.dev`) để redirect an toàn.
+
+### `GET /api/auth/logout`
+- **Mục đích**: Đăng xuất tài khoản VĐV / Admin.
+- **Header Handling**: Trả về `HTTP 204 No Content` khi phát hiện `prefetch` header.
+- **Flow**: Xóa cookie `tm_session` và redirect người dùng về trang chủ `/`.
 
 ---
 
@@ -44,18 +54,11 @@
     "event_time": 1722854400
   }
   ```
-- **Flow**: Push event vào Cloudflare Queue / Edge Function để tải thông tin bài tập từ Strava API v3, chạy động cơ quy đổi `calculateActivityScore` và lưu kết quả vào PostgreSQL.
+- **Flow**: Tải thông tin bài tập từ Strava API v3, chạy động cơ quy đổi `calculateActivityScore` và lưu kết quả vào PostgreSQL.
 
 ---
 
 ## 🛠️ 3. Admin & User Manual Reconciliation Endpoints
 
-### `POST /api/activities/resync`
-- **Mục đích**: Kéo bài tập bị thiếu thủ công qua mã `strava_activity_id`.
-- **Body Payload**:
-  ```json
-  {
-    "strava_activity_id": 987654321
-  }
-  ```
-- **Response**: `200 OK` với chi tiết chỉ số đã đối soát và cập nhật thành công vào Bảng Xếp Hạng.
+### `POST /api/webhook/setup`
+- **Mục đích**: Khởi tạo và thiết lập Strava Webhook Subscription tự động cho môi trường Cloudflare Workers.
