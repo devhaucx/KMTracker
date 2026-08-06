@@ -45,11 +45,12 @@ export default function Header({ user }: HeaderProps) {
         backdropFilter: 'blur(12px)',
         borderBottom: '1px solid var(--border-base)',
         boxShadow: '0 2px 10px rgba(15, 23, 42, 0.04)',
-        paddingTop: 'env(safe-area-inset-top, 0px)',
+        // paddingTop handled in container for safe-area
       }}>
         <div className="container" style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          height: '56px', padding: '0 1rem',
+          height: '56px', padding: '0 0.75rem', // Reduced from 1rem for mobile
+          paddingTop: 'env(safe-area-inset-top, 0px)', // Add safe area top padding
         }}>
           {/* Logo & Context Title */}
           <Link href={isAdminContext ? "/admin" : "/"} style={{
@@ -111,7 +112,7 @@ export default function Header({ user }: HeaderProps) {
               isLoggedIn ? (
                 <Link href="/profile" className="mobile-stack" style={{
                   alignItems: 'center', gap: '0.4rem',
-                  padding: '0.25rem 0.65rem 0.25rem 0.25rem',
+                  padding: '0.25rem 0.5rem 0.25rem 0.25rem', // Reduced padding
                   borderRadius: 'var(--radius-full)',
                   border: '1px solid var(--border-base)',
                   background: 'var(--bg-subtle)',
@@ -119,6 +120,8 @@ export default function Header({ user }: HeaderProps) {
                   color: 'var(--text-primary)',
                   textDecoration: 'none',
                   maxWidth: '100vw',
+                  minWidth: 0, // Allow shrinking
+                  flexShrink: 1, // Allow shrinking when needed
                 }}>
                   {user?.avatar_url ? (
                     <img src={user.avatar_url} alt={displayName} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
@@ -127,7 +130,15 @@ export default function Header({ user }: HeaderProps) {
                       {userInitial}
                     </span>
                   )}
-                  <span style={{ maxWidth: 'clamp(60px, 15vw, 100px)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 700 }}>
+                  <span style={{
+                    maxWidth: 'clamp(40px, 12vw, 80px)', // Reduced from 60px/15vw/100px
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    fontWeight: 700,
+                    flexShrink: 1, // Allow shrinking
+                    minWidth: 0, // Allow shrinking to 0 if needed
+                  }}>
                     {displayName}
                   </span>
                 </Link>
