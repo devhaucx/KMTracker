@@ -14,7 +14,7 @@ export interface StravaTokenResponse {
 
 export function getStravaAuthUrl(redirectUri: string, state?: string): string {
   const clientId = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID || ''
-  const scope = 'read,activity:read'
+  const scope = 'read,activity:read_all'
   
   const params = new URLSearchParams({
     client_id: clientId,

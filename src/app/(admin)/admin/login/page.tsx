@@ -1,23 +1,26 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Shield, Mail, Lock, ArrowRight } from 'lucide-react'
+import Link from 'next/link'
+import { Shield, Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react'
+import { adminLogin } from './actions'
 
 export default function AdminLoginPage() {
-  const router = useRouter()
-  const [email, setEmail]     = useState('')
-  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState('')
+  const [error, setError] = useState('')
 
-  const submit = (e: React.FormEvent) => {
-    e.preventDefault(); setLoading(true); setError('')
-    setTimeout(() => {
-      if (email && password) { document.cookie = 'admin_session=true; path=/'; router.push('/admin') }
-      else { setError('Vui lòng nhập đầy đủ email và mật khẩu.') }
+  async function submit(formData: FormData) {
+    setLoading(true); setError('')
+    try {
+      const result = await adminLogin(formData)
+      if (result?.error) {
+        setError(result.error)
+        setLoading(false)
+      }
+    } catch {
+      setError('Đăng nhập thất bại. Vui lòng thử lại.')
       setLoading(false)
-    }, 600)
+    }
   }
 
   return (
@@ -35,22 +38,19 @@ export default function AdminLoginPage() {
         </div>
 
         <div className="card" style={{ padding: '1.75rem 2rem' }}>
-          <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
+          <form action={submit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
                 <Mail size={13} style={{ color: 'var(--text-tertiary)' }} /> Email
               </label>
-              <input type="email" required placeholder="admin@company.com" value={email}
-                onChange={e => setEmail(e.target.value)} className="input" />
+              <input type="email" name="email" required placeholder="admin@company.com" className="input" />
             </div>
 
             <div>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
                 <Lock size={13} style={{ color: 'var(--text-tertiary)' }} /> Mật khẩu
               </label>
-              <input type="password" required placeholder="••••••••" value={password}
-                onChange={e => setPassword(e.target.value)} className="input" />
+              <input type="password" name="password" required placeholder="••••••••" className="input" />
             </div>
 
             {error && (
@@ -61,6 +61,12 @@ export default function AdminLoginPage() {
               {loading ? 'Đang đăng nhập…' : <><ArrowRight size={16} /> Truy cập trang quản trị</>}
             </button>
           </form>
+        </div>
+
+        <div style={{ textAlign: 'center', marginTop: '1.25rem' }}>
+          <Link href="/" className="btn btn-ghost btn-sm" style={{ color: 'var(--text-secondary)', gap: '0.35rem' }}>
+            <ArrowLeft size={14} /> Về trang chủ
+          </Link>
         </div>
       </div>
     </div>

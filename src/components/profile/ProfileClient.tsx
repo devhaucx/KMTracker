@@ -1,0 +1,86 @@
+'use client'
+
+import { useState } from 'react'
+import Link from 'next/link'
+import { Building2, CheckCircle2, LogOut } from 'lucide-react'
+import { updateDepartment } from '@/app/(auth)/profile/actions'
+import type { UserProfile, Department } from '@/lib/supabase/types'
+
+export default function ProfileClient({ user, departments }: { user: UserProfile; departments: Department[] }) {
+  const [dept, setDept] = useState(user.department_id || '')
+  const [saved, setSaved] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const save = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    const result = await updateDepartment(dept)
+    setLoading(false)
+    if (result?.success) {
+      setSaved(true)
+      setTimeout(() => setSaved(false), 3000)
+    }
+  }
+
+  return (
+    <div className="container" style={{ padding: '1.5rem 1.5rem 4rem', maxWidth: 640 }}>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <h1 style={{ fontSize: '1.375rem', fontWeight: 700, marginBottom: '0.2rem' }}>Hồ sơ cá nhân</h1>
+        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+          Cập nhật phòng ban để điểm được ghi nhận vào bảng đồng đội.
+        </p>
+      </div>
+
+      <div className="card" style={{ padding: '1.5rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingBottom: '1.25rem', borderBottom: '1px solid var(--border-base)', marginBottom: '1.25rem' }}>
+          <div style={{ width: 64, height: 64, borderRadius: '50%', background: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 700, flexShrink: 0 }}>
+            {user.full_name.charAt(0)}
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '1.05rem' }}>{user.full_name}</div>
+            {user.strava_athlete_id && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginTop: '0.25rem', fontSize: '0.825rem', color: 'var(--color-success)', fontWeight: 500 }}>
+                <CheckCircle2 size={14} /> Đã kết nối Strava (#{user.strava_athlete_id})
+              </div>
+            )}
+          </div>
+        </div>
+
+        <form onSubmit={save} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+          <div>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 600, fontSize: '0.875rem', marginBottom: '0.5rem' }}>
+              <Building2 size={14} style={{ color: 'var(--text-tertiary)' }} /> Phòng ban
+            </label>
+            <select value={dept} onChange={e => setDept(e.target.value)} className="input">
+              <option value="">-- Chọn phòng ban --</option>
+              {departments.map(d => <option key={d.id} value={d.id}>{d.name} ({d.code})</option>)}
+            </select>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0.875rem 1rem', background: 'var(--bg-subtle)', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', fontSize: '0.875rem' }}>
+            <span style={{ color: 'var(--text-secondary)' }}>Vai trò</span>
+            <span className="badge badge-blue">{user.role === 'admin' || user.role === 'super_admin' ? 'Quản trị' : 'Vận động viên'}</span>
+          </div>
+
+          {saved && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem 1rem', background: 'var(--color-success-bg)', border: '1px solid var(--color-success-border)', borderRadius: 'var(--radius-md)', color: 'var(--color-success)', fontSize: '0.875rem', fontWeight: 500 }}>
+              <CheckCircle2 size={16} /> Đã lưu thành công.
+            </div>
+          )}
+
+          <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.65rem' }} disabled={loading}>
+            {loading ? 'Đang lưu…' : 'Lưu thay đổi'}
+          </button>
+        </form>
+      </div>
+
+      <Link href="/api/auth/logout" className="btn btn-sm" style={{
+        width: '100%', justifyContent: 'center', marginTop: '1rem',
+        color: 'var(--color-danger)', borderColor: 'var(--color-danger-border)',
+        background: 'transparent', gap: '0.4rem',
+      }}>
+        <LogOut size={15} /> Đăng xuất
+      </Link>
+    </div>
+  )
+}

@@ -1,26 +1,10 @@
-'use client'
-
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { MOCK_USER } from '@/lib/mock/data'
+import { getCurrentUser } from '@/lib/auth/session'
 import { ShieldAlert } from 'lucide-react'
 
-export default function AuthLayout({ children }: { children: React.ReactNode }) {
-  const router = useRouter()
-  const [authorized, setAuthorized] = useState(true)
+export default async function AuthLayout({ children }: { children: React.ReactNode }) {
+  const user = await getCurrentUser()
 
-  // In real implementation, check Supabase auth session or cookies.
-  // In mock mode, user is authenticated by default or redirected.
-  useEffect(() => {
-    // Mock authorization check
-    const hasMockSession = true
-    if (!hasMockSession) {
-      setAuthorized(false)
-      router.push('/api/auth/strava')
-    }
-  }, [router])
-
-  if (!authorized) {
+  if (!user) {
     return (
       <div className="container" style={{ padding: '4rem 1.5rem', textAlign: 'center' }}>
         <div className="card" style={{ maxWidth: 400, margin: '0 auto', padding: '2rem' }}>

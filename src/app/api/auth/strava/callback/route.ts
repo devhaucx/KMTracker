@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-const MOCK_MODE = !process.env.STRAVA_CLIENT_ID
-
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
-  const isMock  = searchParams.get('mock') === '1'
   const error   = searchParams.get('error')
   const code    = searchParams.get('code')
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`
@@ -13,24 +10,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${baseUrl}/?error=strava_auth_cancelled`)
   }
 
-  // ── MOCK PATH ────────────────────────────────────────────
-  if (MOCK_MODE || isMock) {
-    const response = NextResponse.redirect(`${baseUrl}/dashboard`)
-    response.cookies.set('mock_user_id', 'mock-user-1', {
-      httpOnly: true,
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
-    })
-    response.cookies.set('mock_mode', '1', {
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7,
-      path: '/',
-    })
-    return response
-  }
-
-  // ── PRODUCTION PATH ──────────────────────────────────────
   if (!code) {
     return NextResponse.redirect(`${baseUrl}/?error=missing_code`)
   }
@@ -92,6 +71,13 @@ export async function GET(request: NextRequest) {
           { user_id: userId, competition_id: comp.id, status: 'active' },
           { onConflict: 'user_id, competition_id' }
         )
+
+        try {
+          const { backfillUserActivities } = await import('@/lib/strava/backfill')
+          await backfillUserActivities(userId, comp.id)
+        } catch (backfillErr) {
+          console.error('Backfill failed (non-blocking):', backfillErr)
+        }
       }
     }
 
@@ -100,10 +86,8 @@ export async function GET(request: NextRequest) {
       : `${baseUrl}/profile?setup=true`
 
     const response = NextResponse.redirect(redirectUrl)
-    response.cookies.set('user_id', userId, {
-      httpOnly: true, secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', maxAge: 60 * 60 * 24 * 30, path: '/',
-    })
+    const { setSessionCookie } = await import('@/lib/auth/session')
+    await setSessionCookie(userId, response)
     return response
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'auth_error'
