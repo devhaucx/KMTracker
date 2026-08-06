@@ -29,11 +29,6 @@ const NAV_ITEMS = [
 const MOBILE_PRIMARY = NAV_ITEMS.slice(0, 4)
 const MOBILE_SECONDARY = NAV_ITEMS.slice(4)
 
-function getPageTitle(pathname: string): string {
-  const item = NAV_ITEMS.find(n => n.exact ? pathname === n.href : pathname.startsWith(n.href))
-  return item?.label || 'Quản trị'
-}
-
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [moreSheetOpen, setMoreSheetOpen] = useState(false)
@@ -104,24 +99,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
       </aside>
 
       {/* Main content area */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        {/* Native Android Top App Bar */}
-        <div className="show-mobile" style={{
-          height: 44, padding: '0 0.85rem',
-          background: 'var(--bg-base)', borderBottom: '1px solid var(--border-subtle)',
-          alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 56, zIndex: 10,
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-            <Shield size={16} style={{ color: 'var(--color-primary)' }} />
-            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-              {getPageTitle(pathname)}
-            </span>
-          </div>
-          <Link href="/leaderboard" style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
-            <ExternalLink size={12} /> Bảng điểm
-          </Link>
-        </div>
-
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, width: '100%' }}>
         <div className="admin-content" style={{ flex: 1, overflowY: 'auto' }}>{children}</div>
       </div>
 

@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import ThemeToggle from './ThemeToggle'
-import { Trophy, LayoutDashboard, User, Shield, Activity, Zap } from 'lucide-react'
+import { Trophy, LayoutDashboard, User, Shield, Activity, Zap, ExternalLink, LogOut } from 'lucide-react'
 
 interface HeaderProps {
   user?: { full_name?: string; avatar_url?: string | null; role?: string } | null
@@ -42,19 +42,25 @@ export default function Header({ user }: HeaderProps) {
         backdropFilter: 'blur(12px)',
         borderBottom: '1px solid var(--border-base)',
         boxShadow: '0 2px 10px rgba(15, 23, 42, 0.04)',
+        paddingTop: 'env(safe-area-inset-top, 0px)',
       }}>
         <div className="container" style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          height: '60px', padding: '0 1.25rem',
+          height: '56px', padding: '0 1rem',
         }}>
-          {/* Logo */}
-          <Link href="/" style={{
-            display: 'flex', alignItems: 'center', gap: '0.6rem',
-            fontWeight: 700, fontSize: '1rem', letterSpacing: '-0.01em',
+          {/* Logo & Context Title */}
+          <Link href={isAdminContext ? "/admin" : "/"} style={{
+            display: 'flex', alignItems: 'center', gap: '0.5rem',
+            fontWeight: 700, fontSize: '0.95rem', letterSpacing: '-0.01em',
             color: 'var(--text-primary)', flexShrink: 0,
           }}>
             <img src="/icon.svg" alt="TM Tracker" width={32} height={32} style={{ borderRadius: '8px', flexShrink: 0, boxShadow: '0 2px 8px rgba(37,99,235,0.2)' }} />
-            <span>TM Tracker</span>
+            <span style={{ fontWeight: 800 }}>TM Tracker</span>
+            {isAdminContext && (
+              <span className="badge badge-blue" style={{ fontSize: '0.7rem', padding: '0.1rem 0.4rem' }}>
+                Admin
+              </span>
+            )}
           </Link>
 
           {/* Desktop Nav */}
@@ -78,40 +84,48 @@ export default function Header({ user }: HeaderProps) {
           )}
 
           {/* Right actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginLeft: isLoggedIn ? undefined : 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginLeft: 'auto' }}>
             <ThemeToggle />
 
             {!isAdminContext && (
-              <Link href="/admin/login" className="btn btn-secondary btn-sm" style={{ color: 'var(--color-warning)', gap: '0.35rem' }}>
+              <Link href="/admin/login" className="btn btn-secondary btn-sm" style={{ color: 'var(--color-warning)', gap: '0.3rem', fontSize: '0.8rem', padding: '0.3rem 0.6rem' }}>
                 <Shield size={14} /> <span className="hide-mobile">Admin</span>
               </Link>
             )}
 
-            {isLoggedIn ? (
-              <Link href="/profile" style={{
-                display: 'flex', alignItems: 'center', gap: '0.5rem',
-                padding: '0.3rem 0.65rem 0.3rem 0.3rem',
-                borderRadius: 'var(--radius-full)',
-                border: '1px solid var(--border-base)',
-                background: 'var(--bg-subtle)',
-                fontSize: '0.85rem', fontWeight: 600,
-                color: 'var(--text-primary)',
-              }}>
-                {user?.avatar_url ? (
-                  <img src={user.avatar_url} alt={displayName} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
-                ) : (
-                  <span style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>
-                    {userInitial}
-                  </span>
-                )}
-                <span className="hide-mobile" style={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {displayName}
-                </span>
-              </Link>
-            ) : (
-              <a href="/api/auth/strava" className="btn btn-primary btn-sm" style={{ gap: '0.35rem', boxShadow: '0 2px 8px rgba(37,99,235,0.25)' }}>
-                <Zap size={14} /> <span className="hide-mobile">Tham gia</span>
+            {isAdminContext && (
+              <a href="/api/auth/logout" className="btn btn-secondary btn-sm" style={{ color: 'var(--color-danger)', gap: '0.3rem', fontSize: '0.8rem', padding: '0.3rem 0.6rem' }}>
+                <LogOut size={14} /> <span className="hide-mobile">Đăng xuất</span>
               </a>
+            )}
+
+            {!isAdminContext && (
+              isLoggedIn ? (
+                <Link href="/profile" style={{
+                  display: 'flex', alignItems: 'center', gap: '0.4rem',
+                  padding: '0.25rem 0.65rem 0.25rem 0.25rem',
+                  borderRadius: 'var(--radius-full)',
+                  border: '1px solid var(--border-base)',
+                  background: 'var(--bg-subtle)',
+                  fontSize: '0.85rem', fontWeight: 600,
+                  color: 'var(--text-primary)',
+                }}>
+                  {user?.avatar_url ? (
+                    <img src={user.avatar_url} alt={displayName} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
+                  ) : (
+                    <span style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>
+                      {userInitial}
+                    </span>
+                  )}
+                  <span className="hide-mobile" style={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {displayName}
+                  </span>
+                </Link>
+              ) : (
+                <a href="/api/auth/strava" className="btn btn-primary btn-sm" style={{ gap: '0.35rem', boxShadow: '0 2px 8px rgba(37,99,235,0.25)', fontSize: '0.8rem', padding: '0.3rem 0.65rem' }}>
+                  <Zap size={14} /> <span className="hide-mobile">Tham gia</span>
+                </a>
+              )
             )}
           </div>
         </div>
