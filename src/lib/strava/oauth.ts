@@ -44,6 +44,11 @@ export async function exchangeStravaCode(code: string): Promise<StravaTokenRespo
   })
 
   if (!response.ok) {
+    // Handle rate limiting
+    if (response.status === 429) {
+      const retryAfter = response.headers.get('Retry-After')
+      throw new Error(`Rate limited. Retry after ${retryAfter} seconds`)
+    }
     const errorText = await response.text()
     throw new Error(`Strava token exchange failed: ${errorText}`)
   }
@@ -67,6 +72,11 @@ export async function refreshStravaToken(refreshToken: string): Promise<StravaTo
   })
 
   if (!response.ok) {
+    // Handle rate limiting
+    if (response.status === 429) {
+      const retryAfter = response.headers.get('Retry-After')
+      throw new Error(`Rate limited. Retry after ${retryAfter} seconds`)
+    }
     const errorText = await response.text()
     throw new Error(`Strava token refresh failed: ${errorText}`)
   }

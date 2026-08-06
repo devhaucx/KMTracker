@@ -49,21 +49,40 @@ export async function backfillUserActivities(userId: string, competitionId: stri
     return { success: false, error: 'Cannot get valid Strava token' }
   }
 
+  // Use UTC timestamps to avoid timezone issues
+  // Add buffer to end date to include full final day
   const afterEpoch = Math.floor(new Date(competition.start_date).getTime() / 1000)
-  const beforeEpoch = Math.floor(new Date(competition.end_date).getTime() / 1000)
+  const beforeEpoch = Math.floor((new Date(competition.end_date).getTime() + 86399000) / 1000) // +23:59:59
 
-  let page = 1
+  let afterCursor: number | undefined = undefined
   let hasMore = true
   let processed = 0
 
   while (hasMore) {
-    const url = `https://www.strava.com/api/v3/athlete/activities?after=${afterEpoch}&before=${beforeEpoch}&per_page=100&page=${page}`
+    // Use cursor-based pagination as per Strava API 2025 spec
+    const params = new URLSearchParams({
+      after: afterEpoch.toString(),
+      before: beforeEpoch.toString(),
+      page_size: '100', // Use page_size instead of deprecated per_page
+    })
+
+    if (afterCursor) {
+      params.append('after_cursor', afterCursor.toString())
+    }
+
+    const url = `https://www.strava.com/api/v3/athlete/activities?${params.toString()}`
     const res = await fetch(url, {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
 
     if (!res.ok) {
-      console.error(`Backfill fetch failed page ${page}: ${res.status}`)
+      // Handle rate limiting specifically
+      if (res.status === 429) {
+        const retryAfter = res.headers.get('Retry-After')
+        console.error(`Rate limited on backfill. Retry after: ${retryAfter} seconds`)
+        return { success: false, error: `Rate limited. Retry after ${retryAfter}s` }
+      }
+      console.error(`Backfill fetch failed: ${res.status}`)
       break
     }
 
@@ -109,8 +128,10 @@ export async function backfillUserActivities(userId: string, competitionId: stri
       processed++
     }
 
-    hasMore = activities.length === 100
-    page++
+    // Get cursor from the last activity for next page
+    const lastActivity = activities[activities.length - 1]
+    afterCursor = lastActivity?.id // Use activity ID as cursor
+    hasMore = activities.length === 100 // Continue if we got a full page
   }
 
   console.log(`Backfill complete for user ${userId}: ${processed} activities processed`)

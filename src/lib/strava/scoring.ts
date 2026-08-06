@@ -50,6 +50,7 @@ export function mapStravaSportCategory(stravaType: string): SportType | 'Other' 
 
 /**
  * Calculates activity score against competition rules
+ * All dates are handled as UTC timestamps to avoid timezone issues
  */
 export function calculateActivityScore(
   rawStravaType: string,
@@ -76,11 +77,13 @@ export function calculateActivityScore(
     }
   }
 
-  // Date window validation
+  // Date window validation - handle as UTC timestamps to avoid timezone issues
+  // Strava dates are always UTC, competition dates should be stored as UTC
   if (compStartDateIso && compEndDateIso) {
     const activityDate = new Date(startDateIso).getTime()
+    // Add 1 second buffer to end date to include full final day (23:59:59)
     const compStart = new Date(compStartDateIso).getTime()
-    const compEnd = new Date(compEndDateIso).getTime()
+    const compEnd = new Date(compEndDateIso).getTime() + 86399000 // +23:59:59 in ms
 
     if (activityDate < compStart || activityDate > compEnd) {
       return {

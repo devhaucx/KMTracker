@@ -23,6 +23,7 @@ export default function Header({ user }: HeaderProps) {
   const navLinks = [
     { href: '/leaderboard', label: 'Bảng xếp hạng', icon: <Trophy size={15} /> },
     { href: '/dashboard',   label: 'Dashboard',      icon: <LayoutDashboard size={15} /> },
+    { href: '/competitions', label: 'Cuộc thi',       icon: <Zap size={15} /> },
     { href: '/rules',       label: 'Thể lệ',         icon: <Activity size={15} /> },
     { href: '/profile',     label: 'Cá nhân',        icon: <User size={15} /> },
   ]
@@ -30,6 +31,7 @@ export default function Header({ user }: HeaderProps) {
   const mobileTabs = [
     { href: '/leaderboard', label: 'BXH',        icon: <Trophy size={18} /> },
     { href: '/dashboard',   label: 'Dashboard',  icon: <LayoutDashboard size={18} /> },
+    { href: '/competitions', label: 'Giải',      icon: <Zap size={18} /> },
     { href: '/rules',       label: 'Thể lệ',     icon: <Activity size={18} /> },
     { href: '/profile',     label: 'Cá nhân',    icon: <User size={18} /> },
   ]
@@ -101,23 +103,25 @@ export default function Header({ user }: HeaderProps) {
 
             {!isAdminContext && (
               isLoggedIn ? (
-                <Link href="/profile" style={{
-                  display: 'flex', alignItems: 'center', gap: '0.4rem',
+                <Link href="/profile" className="mobile-stack" style={{
+                  alignItems: 'center', gap: '0.4rem',
                   padding: '0.25rem 0.65rem 0.25rem 0.25rem',
                   borderRadius: 'var(--radius-full)',
                   border: '1px solid var(--border-base)',
                   background: 'var(--bg-subtle)',
                   fontSize: '0.85rem', fontWeight: 600,
                   color: 'var(--text-primary)',
+                  textDecoration: 'none',
+                  maxWidth: '100vw',
                 }}>
                   {user?.avatar_url ? (
-                    <img src={user.avatar_url} alt={displayName} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
+                    <img src={user.avatar_url} alt={displayName} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
                   ) : (
-                    <span style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>
+                    <span style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, flexShrink: 0 }}>
                       {userInitial}
                     </span>
                   )}
-                  <span className="hide-mobile" style={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <span style={{ maxWidth: 'clamp(60px, 15vw, 100px)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontWeight: 700 }}>
                     {displayName}
                   </span>
                 </Link>

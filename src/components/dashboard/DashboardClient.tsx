@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
-import { CheckCircle2, XCircle, Trophy, RefreshCw, KeyRound, ArrowRight, Flame, ChevronDown } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { CheckCircle2, XCircle, Trophy, RefreshCw, KeyRound, ArrowRight, Flame, ChevronDown, Calendar, Clock, AlertCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import RejectionReason from '@/components/common/RejectionReason'
+import Breadcrumbs from '@/components/common/Breadcrumbs'
 import type { Activity, Competition, UserProfile } from '@/lib/supabase/types'
 
 interface Props {
@@ -60,6 +62,52 @@ export default function DashboardClient({ user, competitions, activeCompetition,
     router.push(`/join/${code.toUpperCase()}`)
   }
 
+  // Countdown timer component for registration deadline
+  const CountdownTimer = ({ deadline }: { deadline: string }) => {
+    const [timeLeft, setTimeLeft] = useState('')
+
+    useEffect(() => {
+      const calculateTimeLeft = () => {
+        const now = new Date().getTime()
+        const deadlineTime = new Date(deadline).getTime()
+        const diff = deadlineTime - now
+
+        if (diff <= 0) return 'Đã hết hạn'
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+
+        if (days > 0) return `${days}n ${hours}g`
+        if (hours > 0) return `${hours}g ${minutes}p`
+        return `${minutes}p`
+      }
+
+      setTimeLeft(calculateTimeLeft())
+      const timer = setInterval(() => setTimeLeft(calculateTimeLeft()), 60000)
+      return () => clearInterval(timer)
+    }, [deadline])
+
+    const isUrgent = timeLeft && (timeLeft.includes('p') || timeLeft.includes('g'))
+
+    if (!timeLeft || timeLeft === 'Đã hết hạn') return null
+
+    return (
+      <span className="badge" style={{
+        background: isUrgent ? 'var(--color-danger-bg)' : 'var(--color-warning-bg)',
+        color: isUrgent ? 'var(--color-danger)' : 'var(--color-warning)',
+        fontWeight: 700,
+        fontSize: '0.75rem',
+        padding: '0.2rem 0.5rem',
+        gap: '0.25rem',
+        display: 'inline-flex',
+        alignItems: 'center'
+      }}>
+        <Clock size={11} /> {timeLeft}
+      </span>
+    )
+  }
+
   const STATS = [
     { label: 'KM quy đổi',     value: totalConverted.toFixed(1), sub: 'km',  accent: 'var(--color-primary)' },
     { label: 'Bài tập hợp lệ', value: `${validCount}`,            sub: 'hoạt động', accent: 'var(--color-success)' },
@@ -69,6 +117,9 @@ export default function DashboardClient({ user, competitions, activeCompetition,
 
   return (
     <div className="container" style={{ padding: '1.5rem 1.5rem 4rem' }}>
+      <Breadcrumbs items={[
+        { label: 'Dashboard', current: true }
+      ]} />
 
       {/* 1. Competition banner (simplified) */}
       {selectedComp && (
@@ -85,11 +136,19 @@ export default function DashboardClient({ user, competitions, activeCompetition,
                   <Flame size={12} /> ĐANG THAM GIA
                 </span>
                 <span className="badge badge-blue" style={{ fontWeight: 700, fontSize: '0.75rem' }}>Mã: {selectedComp.invite_code}</span>
+                <CountdownTimer deadline={selectedComp.registration_deadline} />
               </div>
               <h1 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '0.2rem' }}>{selectedComp.name}</h1>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                {new Date(selectedComp.start_date).toLocaleDateString('vi-VN')} → {new Date(selectedComp.end_date).toLocaleDateString('vi-VN')}
-              </p>
+              <div className="mobile-stack" style={{ gap: '0.5rem', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Calendar size={14} style={{ color: 'var(--color-primary)' }} />
+                  <span>Thi đấu: {new Date(selectedComp.start_date).toLocaleDateString('vi-VN')} → {new Date(selectedComp.end_date).toLocaleDateString('vi-VN')}</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Clock size={14} style={{ color: 'var(--color-warning)' }} />
+                  <span>Đăng ký đến: <strong>{new Date(selectedComp.registration_deadline).toLocaleDateString('vi-VN')}</strong></span>
+                </div>
+              </div>
             </div>
             {competitions.length > 1 && (
               <select value={selectedCompId} onChange={e => setSelectedCompId(e.target.value)} className="input mobile-full-width"
@@ -103,16 +162,18 @@ export default function DashboardClient({ user, competitions, activeCompetition,
 
       {/* 2. Stats + Resync button */}
       <div className="mobile-stack" style={{ alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1rem', gap: '0.75rem' }}>
-        <div>
-          <h2 style={{ fontSize: '1.15rem', fontWeight: 700, marginBottom: '0.1rem' }}>
-            Thành tích của {user.full_name}
-          </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.825rem' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.1rem' }}>
+            <h2 style={{ fontSize: 'clamp(1rem, 4vw, 1.15rem)', fontWeight: 700, margin: 0 }}>
+              Thành tích của <span style={{ color: 'var(--color-primary)' }}>{user.full_name}</span>
+            </h2>
+          </div>
+          <p style={{ color: 'var(--text-secondary)', fontSize: 'clamp(0.75rem, 2.5vw, 0.825rem)' }}>
             {user.strava_athlete_id ? `Strava #${user.strava_athlete_id}` : 'Chưa kết nối Strava'}
           </p>
         </div>
-        <button onClick={handleResync} disabled={resyncing} className="btn btn-secondary btn-sm mobile-full-width" style={{ gap: '0.35rem' }}>
-          <RefreshCw size={14} className={resyncing ? 'animate-spin' : ''} /> {resyncing ? 'Đang đồng bộ...' : 'Đồng bộ lại'}
+        <button onClick={handleResync} disabled={resyncing} className="btn btn-secondary btn-sm mobile-full-width" style={{ gap: '0.35rem', minWidth: 'auto' }}>
+          <RefreshCw size={14} className={resyncing ? 'animate-spin' : ''} /> <span className="hide-mobile">{resyncing ? 'Đang đồng bộ...' : 'Đồng bộ lại'}</span>
         </button>
       </div>
 
@@ -127,8 +188,8 @@ export default function DashboardClient({ user, competitions, activeCompetition,
       </div>
 
       {/* 3. Activity history (PRIMARY content — moved up) */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-        <h2 style={{ fontSize: '1.0625rem', fontWeight: 700 }}>Lịch sử bài tập</h2>
+      <div className="mobile-stack" style={{ alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem', gap: '0.5rem' }}>
+        <h2 style={{ fontSize: 'clamp(0.95rem, 3.5vw, 1.0625rem)', fontWeight: 700 }}>Lịch sử bài tập</h2>
         {selectedComp && (
           <span className="hide-mobile" style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
             {new Date(selectedComp.start_date).toLocaleDateString('vi-VN')} → {new Date(selectedComp.end_date).toLocaleDateString('vi-VN')}
@@ -181,7 +242,7 @@ export default function DashboardClient({ user, competitions, activeCompetition,
                         <td style={{ textAlign: 'center' }}>
                           {a.is_valid
                             ? <span className="badge status-ok" style={{ gap: '0.25rem' }}><CheckCircle2 size={13} /> Hợp lệ</span>
-                            : <span className="badge status-err" title={a.rejection_reason || ''} style={{ gap: '0.25rem', cursor: 'help' }}><XCircle size={13} /> Loại</span>}
+                            : <RejectionReason reason={a.rejection_reason} compact />}
                         </td>
                       </tr>
                     )
@@ -196,34 +257,34 @@ export default function DashboardClient({ user, competitions, activeCompetition,
             {compActivities.map(a => {
               const meta = SPORT_META[a.sport_type] || { icon: '体育局', badge: 'badge', color: 'var(--text-tertiary)', border: 'var(--border-base)' }
               return (
-                <div key={a.id} className="card" style={{ padding: '1rem 1.25rem', borderLeftWidth: '4px', borderLeftColor: meta.border }}>
+                <div key={a.id} className="card" style={{ padding: 'clamp(0.75rem, 2vw, 1rem) clamp(0.875rem, 2.5vw, 1.25rem)', borderLeftWidth: '4px', borderLeftColor: meta.border }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.4rem' }}>
                     <a href={`https://www.strava.com/activities/${a.strava_activity_id}`} target="_blank" rel="noopener noreferrer"
-                      style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--color-primary)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                      {a.activity_name} ↗
+                      style={{ fontWeight: 600, fontSize: 'clamp(0.825rem, 3vw, 0.9rem)', color: 'var(--color-primary)', flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {a.activity_name} <span style={{ fontSize: '0.8em' }}>↗</span>
                     </a>
-                    <span className={meta.badge} style={{ fontSize: '0.7rem', flexShrink: 0 }}>{meta.icon} {a.sport_type}</span>
+                    <span className={meta.badge} style={{ fontSize: 'clamp(0.65rem, 2vw, 0.7rem)', flexShrink: 0 }}>{meta.icon} {a.sport_type}</span>
                   </div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: '0.6rem' }}>
+                  <div style={{ fontSize: 'clamp(0.7rem, 2vw, 0.75rem)', color: 'var(--text-tertiary)', marginBottom: '0.6rem' }}>
                     {new Date(a.start_date).toLocaleDateString('vi-VN')} · #{a.strava_activity_id}
                   </div>
-                  <div style={{ display: 'flex', gap: '1rem', fontSize: '0.825rem', marginBottom: '0.5rem' }}>
-                    <div>
+                  <div className="mobile-stack" style={{ gap: '1rem', fontSize: 'clamp(0.775rem, 2.5vw, 0.825rem)', marginBottom: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'baseline' }}>
                       <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>Thực tế</div>
                       <div style={{ fontWeight: 600, color: 'var(--text-secondary)' }}>{a.distance_actual_km.toFixed(1)} km</div>
                     </div>
-                    <div>
+                    <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'baseline' }}>
                       <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>Quy đổi</div>
                       <div style={{ fontWeight: 700, color: a.is_valid ? 'var(--color-primary)' : 'var(--text-tertiary)' }}>{a.distance_converted_km.toFixed(1)} km</div>
                     </div>
-                    <div>
+                    <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'baseline' }}>
                       <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>Pace</div>
                       <div style={{ fontWeight: 600, color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{a.pace_or_speed}</div>
                     </div>
                   </div>
                   {a.is_valid
-                    ? <span className="badge status-ok" style={{ gap: '0.25rem', fontSize: '0.7rem' }}><CheckCircle2 size={12} /> Hợp lệ</span>
-                    : <span className="badge status-err" style={{ gap: '0.25rem', fontSize: '0.7rem' }}><XCircle size={12} /> Loại{a.rejection_reason ? ` · ${a.rejection_reason}` : ''}</span>}
+                    ? <span className="badge status-ok" style={{ gap: '0.25rem', fontSize: 'clamp(0.65rem, 2vw, 0.7rem)' }}><CheckCircle2 size={12} /> Hợp lệ</span>
+                    : <RejectionReason reason={a.rejection_reason} compact />}
                 </div>
               )
             })}

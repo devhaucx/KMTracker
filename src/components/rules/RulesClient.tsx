@@ -61,47 +61,48 @@ export default function RulesClient({ competitions }: { competitions: CompWithSp
 
       {/* Header */}
       <div style={{ marginBottom: '1.5rem' }}>
-        <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+        <div style={{ fontSize: 'clamp(0.7rem, 2.5vw, 0.75rem)', fontWeight: 700, color: 'var(--color-primary)', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '0.3rem', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
           <Zap size={14} /> Thể Lệ Cuộc Thi
         </div>
-        <h1 style={{ fontSize: '1.375rem', fontWeight: 700, marginBottom: '0.2rem' }}>
+        <h1 style={{ fontSize: 'clamp(1.2rem, 5vw, 1.375rem)', fontWeight: 700, marginBottom: '0.2rem' }}>
           Quy định tính điểm
         </h1>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+        <p style={{ color: 'var(--text-secondary)', fontSize: 'clamp(0.75rem, 2.5vw, 0.85rem)' }}>
           Dải pace và hệ số quy đổi do Ban Tổ Chức thiết lập cho từng cuộc thi.
         </p>
       </div>
 
       {/* Select Competition Dropdown */}
       <div className="card mobile-stack" style={{
-        padding: '1rem 1.25rem',
+        padding: 'clamp(0.875rem, 2.5vw, 1rem) clamp(1rem, 3vw, 1.25rem)',
         marginBottom: '1.5rem',
         background: 'var(--color-primary-light)',
         borderColor: 'var(--color-primary-ring)',
         alignItems: 'center',
         justifyContent: 'space-between',
+        gap: '1rem',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-          <Layers size={20} style={{ color: 'var(--color-primary)' }} />
-          <div>
-            <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flex: 1, minWidth: 0 }}>
+          <Layers size={20} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontWeight: 700, fontSize: 'clamp(0.9rem, 3vw, 1rem)', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {comp.name} ({comp.invite_code})
             </div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              Mã mời: <strong>{comp.invite_code}</strong> · Trạng thái: {comp.status === 'active' ? '🟢 Đang thi đấu' : comp.status === 'registration' ? '🔵 Đang đăng ký' : '⚪ Đã kết thúc/Lưu trữ'}
+            <div style={{ fontSize: 'clamp(0.75rem, 2.5vw, 0.8rem)', color: 'var(--text-secondary)' }}>
+              <span className="hide-mobile">Mã mời: <strong>{comp.invite_code}</strong> · </span>Trạng thái: {comp.status === 'active' ? '🟢 Đang thi đấu' : comp.status === 'registration' ? '🔵 Đang đăng ký' : '⚪ Đã kết thúc'}
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', minWidth: 0 }}>
+          <label className="hide-mobile" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
             Xem thể lệ giải:
           </label>
           <select
             value={selectedId}
             onChange={e => setSelectedId(e.target.value)}
             className="input"
-            style={{ width: 'auto', minWidth: 200, cursor: 'pointer', fontWeight: 600, background: 'var(--bg-base)' }}
+            style={{ width: '100%', minWidth: 0, cursor: 'pointer', fontWeight: 600, background: 'var(--bg-base)' }}
           >
             {competitions.map(c => (
               <option key={c.competition.id} value={c.competition.id}>
@@ -188,19 +189,19 @@ export default function RulesClient({ competitions }: { competitions: CompWithSp
               {/* Mobile card view */}
               <div className="mobile-card-view">
                 {sports.map(s => (
-                  <div key={s.id} className="card-subtle" style={{ padding: '0.85rem 1rem', opacity: s.is_active ? 1 : 0.6 }}>
+                  <div key={s.id} className="card-subtle" style={{ padding: 'clamp(0.75rem, 2vw, 0.85rem) clamp(0.875rem, 2.5vw, 1rem)', opacity: s.is_active ? 1 : 0.6 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.4rem' }}>
-                      <span className={`badge ${SPORT_BADGE[s.sport_type] || ''}`} style={{ fontSize: '0.8rem' }}>
+                      <span className={`badge ${SPORT_BADGE[s.sport_type] || ''}`} style={{ fontSize: 'clamp(0.7rem, 2.5vw, 0.8rem)' }}>
                         {s.icon} {s.display_name}
                       </span>
                       {s.is_active
-                        ? <span className="badge status-ok" style={{ fontSize: '0.7rem' }}>✓ Tính điểm</span>
-                        : <span className="badge status-err" style={{ fontSize: '0.7rem' }}>✕ Không</span>}
+                        ? <span className="badge status-ok" style={{ fontSize: 'clamp(0.65rem, 2vw, 0.7rem)' }}>✓ Tính điểm</span>
+                        : <span className="badge status-err" style={{ fontSize: 'clamp(0.65rem, 2vw, 0.7rem)' }}>✕ Không</span>}
                     </div>
-                    <div style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--color-primary)', marginBottom: '0.2rem' }}>
+                    <div style={{ fontSize: 'clamp(0.775rem, 2.5vw, 0.825rem)', fontWeight: 700, color: 'var(--color-primary)', marginBottom: '0.2rem' }}>
                       {fmtRatio(s.conversion_ratio)}
                     </div>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    <div style={{ fontSize: 'clamp(0.75rem, 2.5vw, 0.8rem)', color: 'var(--text-secondary)' }}>
                       {fmtPaceRange(s.min_pace_or_speed, s.max_pace_or_speed, s.validation_unit)}
                     </div>
                   </div>
