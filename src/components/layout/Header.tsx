@@ -14,6 +14,7 @@ export default function Header({ user }: HeaderProps) {
 
   const isAuthContext = ['/dashboard', '/leaderboard', '/rules', '/profile', '/competitions'].some(r => pathname.startsWith(r))
   const isAdminContext = pathname.startsWith('/admin')
+  const isHomePage = pathname === '/'
 
   const isLoggedIn = Boolean(user?.full_name) || isAuthContext
 
@@ -65,9 +66,14 @@ export default function Header({ user }: HeaderProps) {
             )}
           </Link>
 
-          {/* Desktop Nav */}
+          {/* Desktop Navigation - ONLY on desktop (768px+) */}
           {isLoggedIn && !isAdminContext && (
-            <nav className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', margin: '0 auto' }}>
+            <nav className="hide-mobile" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              margin: '0 auto',
+            }}>
               {navLinks.map(l => {
                 const active = pathname === l.href
                 return (
@@ -135,11 +141,11 @@ export default function Header({ user }: HeaderProps) {
         </div>
       </header>
 
-      {/* Persistent Mobile Bottom Bar */}
-      {isLoggedIn && !isAdminContext && (
+      {/* Mobile Bottom Navigation - ONLY on mobile (<768px) */}
+      {isLoggedIn && !isAdminContext && !pathname.startsWith('/leaderboard') && !isHomePage && (
         <nav className="mobile-bottom-nav">
           {mobileTabs.map(tab => {
-            const active = pathname === tab.href
+            const active = pathname === tab.href || (isHomePage && tab.href === '/dashboard')
             return (
               <Link key={tab.href} href={tab.href} className={`mobile-nav-item${active ? ' active' : ''}`}>
                 <div className="mobile-nav-item-icon">

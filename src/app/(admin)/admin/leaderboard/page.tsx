@@ -1,11 +1,13 @@
 import { getIndividualLeaderboard, getDepartmentLeaderboard } from '@/lib/queries/leaderboard'
 import { getActiveCompetition } from '@/lib/queries/competition'
-import { getCurrentUser } from '@/lib/auth/session'
+import { requireAdmin } from '@/lib/auth/session'
 import { getAdminStats } from '@/lib/queries/admin'
 import LeaderboardClient from '@/components/leaderboard/LeaderboardClient'
 import type { IndividualLeaderboardEntry } from '@/lib/supabase/types'
 
-export default async function LeaderboardPage() {
+export default async function AdminLeaderboardPage() {
+  await requireAdmin() // Admin-only access
+
   const competition = await getActiveCompetition()
   if (!competition) {
     return (
@@ -20,11 +22,10 @@ export default async function LeaderboardPage() {
     )
   }
 
-  const [individual, department, stats, currentUser] = await Promise.all([
+  const [individual, department, stats] = await Promise.all([
     getIndividualLeaderboard(competition.id),
     getDepartmentLeaderboard(competition.id),
     getAdminStats(competition.id),
-    getCurrentUser(),
   ])
 
   // Aggregate individual entries to unique users for overall ranking
@@ -44,7 +45,7 @@ export default async function LeaderboardPage() {
       individual={uniqueIndividual}
       department={department}
       totalKm={stats.totalKm}
-      currentUserId={currentUser?.id}
+      currentUserId={undefined} // Admin view, don't highlight specific user
       competitionName={competition.name}
     />
   )

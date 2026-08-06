@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Trophy, Calendar, Users, Clock, ArrowRight, CheckCircle2 } from 'lucide-react'
+import { Trophy, Calendar, Users, Clock, ArrowRight, CheckCircle2, Share2, Check } from 'lucide-react'
 import Link from 'next/link'
 import Breadcrumbs from '@/components/common/Breadcrumbs'
 import type { Competition, UserProfile } from '@/lib/supabase/types'
@@ -15,6 +15,7 @@ interface Props {
 export default function CompetitionsClient({ competitions, currentUser }: Props) {
   const router = useRouter()
   const [joining, setJoining] = useState<string | null>(null)
+  const [copiedCompId, setCopiedCompId] = useState<string | null>(null)
 
   // Filter out deleted competitions and sort by status
   const activeCompetitions = competitions
@@ -34,6 +35,35 @@ export default function CompetitionsClient({ competitions, currentUser }: Props)
     } catch (error) {
       console.error('Join error:', error)
       setJoining(null)
+    }
+  }
+
+  const handleShareCompetition = async (comp: Competition) => {
+    const appUrl = window.location.origin
+    const shareUrl = `${appUrl}/join/${comp.invite_code}`
+    const shareText = `Tham gia cuộc thi "${comp.name}" trên TM Tracker! Mã mời: ${comp.invite_code}`
+
+    // Try Web Share API first (mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: comp.name,
+          text: shareText,
+          url: shareUrl,
+        })
+        return
+      } catch (err) {
+        // User cancelled or error, fall back to clipboard
+      }
+    }
+
+    // Fallback: Copy to clipboard
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setCopiedCompId(comp.id)
+      setTimeout(() => setCopiedCompId(null), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
     }
   }
 
@@ -90,29 +120,59 @@ export default function CompetitionsClient({ competitions, currentUser }: Props)
   const getJoinButton = (comp: Competition) => {
     if (!currentUser) {
       return (
-        <a href={`/api/auth/strava?state=${comp.invite_code}`} className="btn btn-primary" style={{ gap: '0.35rem' }}>
-          Tham gia ngay <ArrowRight size={14} />
-        </a>
+        <div className="mobile-stack" style={{ gap: '0.5rem' }}>
+          <a href={`/api/auth/strava?state=${comp.invite_code}`} className="btn btn-primary" style={{ gap: '0.35rem' }}>
+            Tham gia ngay <ArrowRight size={14} />
+          </a>
+          <button
+            onClick={() => handleShareCompetition(comp)}
+            className="btn btn-secondary btn-sm"
+            style={{ gap: '0.35rem', fontSize: '0.8rem' }}
+          >
+            {copiedCompId === comp.id ? <Check size={14} /> : <Share2 size={14} />}
+            <span className="hide-mobile">{copiedCompId === comp.id ? 'Đã copy!' : 'Chia sẻ'}</span>
+          </button>
+        </div>
       )
     }
 
     if (comp.status === 'active') {
       return (
-        <Link href="/dashboard" className="btn btn-secondary" style={{ gap: '0.35rem' }}>
-          <CheckCircle2 size={14} /> Đã tham gia
-        </Link>
+        <div className="mobile-stack" style={{ gap: '0.5rem' }}>
+          <Link href="/dashboard" className="btn btn-secondary" style={{ gap: '0.35rem' }}>
+            <CheckCircle2 size={14} /> Đã tham gia
+          </Link>
+          <button
+            onClick={() => handleShareCompetition(comp)}
+            className="btn btn-secondary btn-sm"
+            style={{ gap: '0.35rem', fontSize: '0.8rem' }}
+          >
+            {copiedCompId === comp.id ? <Check size={14} /> : <Share2 size={14} />}
+            <span className="hide-mobile">{copiedCompId === comp.id ? 'Đã copy!' : 'Chia sẻ'}</span>
+          </button>
+        </div>
       )
     }
 
     return (
-      <button
-        onClick={() => handleJoin(comp.invite_code)}
-        disabled={joining === comp.invite_code}
-        className="btn btn-primary"
-        style={{ gap: '0.35rem' }}
-      >
-        {joining === comp.invite_code ? 'Đang xử lý...' : 'Tham gia giải'} <ArrowRight size={14} />
-      </button>
+      <div className="mobile-stack" style={{ gap: '0.5rem' }}>
+        <button
+          onClick={() => handleJoin(comp.invite_code)}
+          disabled={joining === comp.invite_code}
+          className="btn btn-primary"
+          style={{ gap: '0.35rem' }}
+        >
+          {joining === comp.invite_code ? 'Đang xử lý...' : 'Tham gia giải'} <ArrowRight size={14} />
+        </button>
+        <button
+          onClick={() => handleShareCompetition(comp)}
+          className="btn btn-secondary btn-sm"
+          style={{ gap: '0.35rem', fontSize: '0.8rem' }}
+        >
+          {copiedCompId === comp.id ? <Check size={14} /> : <Share2 size={14} />}
+          <span className="hide-mobile">{copiedCompId === comp.id ? 'Đã copy!' : 'Chia sẻ'}</span>
+        </button>
+      </div>
     )
   }
 

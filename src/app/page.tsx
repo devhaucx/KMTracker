@@ -56,6 +56,9 @@ function LoggedInHome({ user, competitions, activities }: { user: UserProfile; c
           { href: '/leaderboard', icon: Trophy, label: 'Bảng xếp hạng', desc: 'Xem hạng của bạn', color: 'var(--rank-gold)' },
           { href: '/profile', icon: User, label: 'Cá nhân', desc: 'Phòng ban & tài khoản', color: 'var(--color-success)' },
           { href: '/rules', icon: ActivityIcon, label: 'Thể lệ', desc: 'Quy định tính điểm', color: 'var(--color-warning)' },
+          ...(user?.role === 'admin' || user?.role === 'super_admin' ? [
+            { href: '/admin', icon: Shield, label: 'Admin Portal', desc: 'Quản trị hệ thống', color: 'var(--color-warning)' },
+          ] : []),
         ].map(item => {
           const Icon = item.icon
           return (

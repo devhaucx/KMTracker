@@ -15,11 +15,13 @@ import {
   LogOut,
   ExternalLink,
   MoreHorizontal,
+  Zap,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Tổng quan', icon: LayoutDashboard, exact: true },
-  { href: '/admin/competitions', label: 'Cuộc thi', icon: Trophy, exact: false },
+  { href: '/admin/leaderboard', label: 'Bảng xếp hạng', icon: Trophy, exact: false },
+  { href: '/admin/competitions', label: 'Cuộc thi', icon: Zap, exact: false },
   { href: '/admin/activities', label: 'Hoạt động', icon: Activity, exact: false },
   { href: '/admin/users', label: 'Người dùng', icon: Users, exact: false },
   { href: '/admin/departments', label: 'Phòng ban', icon: Building2, exact: false },
@@ -89,9 +91,6 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         </div>
 
         <div style={{ padding: '1rem 0.75rem', borderTop: '1px solid var(--border-subtle)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <Link href="/leaderboard" className="btn btn-ghost btn-sm" style={{ justifyContent: 'flex-start', color: 'var(--text-secondary)', gap: '0.5rem' }}>
-            <ExternalLink size={15} /> Xem trang Leaderboard
-          </Link>
           <a href="/api/auth/logout" className="btn btn-ghost btn-sm" style={{ justifyContent: 'flex-start', color: 'var(--color-danger)', gap: '0.5rem' }}>
             <LogOut size={15} /> Đăng xuất
           </a>
@@ -153,17 +152,6 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                 )
               })}
               <div style={{ height: 1, background: 'var(--border-subtle)', margin: '0.35rem 0' }} />
-              <Link
-                href="/leaderboard" onClick={() => setMoreSheetOpen(false)}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.65rem 0.85rem',
-                  borderRadius: 'var(--radius-md)', fontSize: '0.875rem', fontWeight: 500,
-                  color: 'var(--text-secondary)',
-                }}
-              >
-                <ExternalLink size={18} />
-                <span>Xem trang Leaderboard</span>
-              </Link>
               <a
                 href="/api/auth/logout"
                 style={{

@@ -45,7 +45,7 @@ export async function adminLogin(prevState: any, formData: FormData) {
   }
 
   const { createSessionToken } = await import('@/lib/auth/session')
-  const token = await createSessionToken(profile.id)
+  const token = await createSessionToken(profile.id, profile.role || 'admin')
 
   const cookieStore = await cookies()
   cookieStore.set('tm_session', token, {

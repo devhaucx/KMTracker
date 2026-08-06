@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { CheckCircle2, XCircle, Trophy, RefreshCw, KeyRound, ArrowRight, Flame, ChevronDown, Calendar, Clock, AlertCircle } from 'lucide-react'
+import { CheckCircle2, XCircle, Trophy, RefreshCw, KeyRound, ArrowRight, Flame, ChevronDown, Calendar, Clock, AlertCircle, Share2, Link as LinkIcon, Copy, Check } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import RejectionReason from '@/components/common/RejectionReason'
@@ -28,6 +28,7 @@ export default function DashboardClient({ user, competitions, activeCompetition,
   const [resyncing, setResyncing] = useState(false)
   const [resyncMsg, setResyncMsg] = useState('')
   const [inputCode, setInputCode] = useState('')
+  const [copied, setCopied] = useState(false)
 
   const selectedComp = competitions.find(c => c.id === selectedCompId) || activeCompetition
 
@@ -60,6 +61,37 @@ export default function DashboardClient({ user, competitions, activeCompetition,
       ? inputCode.split('/join/')[1].split('/')[0].split('?')[0]
       : inputCode.trim()
     router.push(`/join/${code.toUpperCase()}`)
+  }
+
+  const handleShareCompetition = async () => {
+    if (!selectedComp) return
+
+    const appUrl = window.location.origin
+    const shareUrl = `${appUrl}/join/${selectedComp.invite_code}`
+    const shareText = `Tham gia cuộc thi "${selectedComp.name}" trên TM Tracker! Mã mời: ${selectedComp.invite_code}`
+
+    // Try Web Share API first (mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: selectedComp.name,
+          text: shareText,
+          url: shareUrl,
+        })
+        return
+      } catch (err) {
+        // User cancelled or error, fall back to clipboard
+      }
+    }
+
+    // Fallback: Copy to clipboard
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
   }
 
   // Countdown timer component for registration deadline
@@ -150,12 +182,22 @@ export default function DashboardClient({ user, competitions, activeCompetition,
                 </div>
               </div>
             </div>
-            {competitions.length > 1 && (
-              <select value={selectedCompId} onChange={e => setSelectedCompId(e.target.value)} className="input mobile-full-width"
-                style={{ width: 'auto', minWidth: 180, fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>
-                {competitions.map(c => <option key={c.id} value={c.id}>{c.name} ({c.invite_code})</option>)}
-              </select>
-            )}
+            <div className="mobile-stack" style={{ gap: '0.5rem' }}>
+              {competitions.length > 1 && (
+                <select value={selectedCompId} onChange={e => setSelectedCompId(e.target.value)} className="input mobile-full-width"
+                  style={{ width: 'auto', minWidth: 180, fontSize: '0.85rem', fontWeight: 700, cursor: 'pointer' }}>
+                  {competitions.map(c => <option key={c.id} value={c.id}>{c.name} ({c.invite_code})</option>)}
+                </select>
+              )}
+              <button
+                onClick={handleShareCompetition}
+                className="btn btn-secondary btn-sm mobile-full-width"
+                style={{ gap: '0.35rem', minWidth: 'auto', fontSize: '0.8rem' }}
+              >
+                {copied ? <Check size={14} /> : <Share2 size={14} />}
+                <span className="hide-mobile">{copied ? 'Đã copy!' : 'Chia sẻ'}</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

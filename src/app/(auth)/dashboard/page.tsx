@@ -1,11 +1,10 @@
-import { getCurrentUser } from '@/lib/auth/session'
+import { requireNonAdmin } from '@/lib/auth/session'
 import { getMyActivities, getMyCompetitions } from '@/lib/queries/user'
 import { getActiveCompetition } from '@/lib/queries/competition'
 import DashboardClient from '@/components/dashboard/DashboardClient'
 
 export default async function DashboardPage() {
-  const user = await getCurrentUser()
-  if (!user) return null
+  const user = await requireNonAdmin() // Blocks admin users
 
   const activeComp = await getActiveCompetition()
   const [competitions, activities] = await Promise.all([

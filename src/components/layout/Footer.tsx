@@ -2,8 +2,15 @@
 
 import Link from 'next/link'
 import { Shield } from 'lucide-react'
+import type { UserProfile } from '@/lib/supabase/types'
 
-export default function Footer() {
+interface FooterProps {
+  user?: UserProfile | null
+}
+
+export default function Footer({ user }: FooterProps) {
+  const isAdmin = user?.role === 'admin' || user?.role === 'super_admin'
+
   return (
     <footer style={{
       marginTop: 'auto',
@@ -28,9 +35,11 @@ export default function Footer() {
           <span style={{ color: 'var(--text-secondary)' }}>© {new Date().getFullYear()} TM Tracker</span>
         </div>
 
-        <Link href="/admin/login" className="hide-mobile" style={{ color: 'var(--color-warning)', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontWeight: 600, fontSize: '0.8rem' }}>
-          <Shield size={13} /> Quản trị
-        </Link>
+        {isAdmin && (
+          <Link href="/admin/login" className="hide-mobile" style={{ color: 'var(--color-warning)', display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontWeight: 600, fontSize: '0.8rem' }}>
+            <Shield size={13} /> Quản trị
+          </Link>
+        )}
       </div>
     </footer>
   )

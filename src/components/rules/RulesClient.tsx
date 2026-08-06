@@ -73,16 +73,19 @@ export default function RulesClient({ competitions }: { competitions: CompWithSp
       </div>
 
       {/* Select Competition Dropdown */}
-      <div className="card mobile-stack" style={{
+      <div className="card" style={{
         padding: 'clamp(0.875rem, 2.5vw, 1rem) clamp(1rem, 3vw, 1.25rem)',
         marginBottom: '1.5rem',
         background: 'var(--color-primary-light)',
         borderColor: 'var(--color-primary-ring)',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: '1rem',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flex: 1, minWidth: 0 }}>
+        {/* Competition info - always on top */}
+        <div className="mobile-stack" style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.6rem',
+          marginBottom: '1rem',
+        }}>
           <Layers size={20} style={{ color: 'var(--color-primary)', flexShrink: 0 }} />
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontWeight: 700, fontSize: 'clamp(0.9rem, 3vw, 1rem)', color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -94,15 +97,19 @@ export default function RulesClient({ competitions }: { competitions: CompWithSp
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%', minWidth: 0 }}>
-          <label className="hide-mobile" style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
-            Xem thể lệ giải:
+        {/* Dropdown selector - full width on mobile */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <label style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            Xem thể lệ giải khác:
+            <span className="badge badge-neutral" style={{ fontSize: '0.7rem', fontWeight: 500 }}>
+              {competitions.length} giải
+            </span>
           </label>
           <select
             value={selectedId}
             onChange={e => setSelectedId(e.target.value)}
             className="input"
-            style={{ width: '100%', minWidth: 0, cursor: 'pointer', fontWeight: 600, background: 'var(--bg-base)' }}
+            style={{ width: '100%', cursor: 'pointer', fontWeight: 600, background: 'var(--bg-base)' }}
           >
             {competitions.map(c => (
               <option key={c.competition.id} value={c.competition.id}>

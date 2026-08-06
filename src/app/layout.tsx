@@ -21,7 +21,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <Header user={user} />
         <main style={{ flex: 1 }}>{children}</main>
-        <Footer />
+        <Footer user={user} />
       </body>
     </html>
   )

@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
 
     const { data: existingUser } = await supabaseAdmin
       .from('users')
-      .select('id, is_profile_complete')
+      .select('id, is_profile_complete, role')
       .eq('strava_athlete_id', athlete.id)
       .single()
 
@@ -88,7 +88,9 @@ export async function GET(request: NextRequest) {
 
     const response = NextResponse.redirect(redirectUrl)
     const { setSessionCookie } = await import('@/lib/auth/session')
-    await setSessionCookie(userId, response)
+    // Get user role for session token
+    const userRole = existingUser?.role || 'user'
+    await setSessionCookie(userId, response, userRole)
     return response
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'auth_error'
