@@ -1,0 +1,87 @@
+# ==============================================================================
+# GitHub Actions Workflow: Database Migration & Deployment
+#
+# Environment: Next.js 16 app deployed to Cloudflare Workers via OpenNext.
+# Database: Supabase (PostgreSQL).
+#
+# Required GitHub Repository Secrets:
+# ----------------------------------
+# DATABASE_URL              - Supabase direct DB connection string
+# CLOUDFLARE_API_TOKEN      - Cloudflare API token (Workers deploy permission)
+# CLOUDFLARE_ACCOUNT_ID     - Cloudflare Account ID
+# NEXT_PUBLIC_SUPABASE_URL  - Supabase project URL
+# NEXT_PUBLIC_SUPABASE_ANON_KEY - Supabase anon (public) key
+# SUPABASE_SERVICE_ROLE_KEY - Supabase service role key (secret)
+# NEXT_PUBLIC_STRAVA_CLIENT_ID - Strava OAuth Client ID
+# STRAVA_CLIENT_ID          - Strava Client ID (server-side)
+# STRAVA_CLIENT_SECRET      - Strava Client Secret
+# STRAVA_WEBHOOK_VERIFY_TOKEN - Strava webhook verify token
+# SESSION_SECRET            - Session encryption secret
+# ==============================================================================
+
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # ----------------------------------------------------------------------------
+  # Job 1: Apply Supabase Database Migrations
+  # ----------------------------------------------------------------------------
+  migrate:
+    name: Run Database Migrations
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Supabase CLI via npm
+        run: npm install supabase
+
+      - name: Apply database migrations
+        run: npx supabase db push --db-url "$DATABASE_URL"
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+
+  # ----------------------------------------------------------------------------
+  # Job 2: Build & Deploy Application
+  # ----------------------------------------------------------------------------
+  deploy:
+    name: Deploy to Cloudflare Workers
+    needs: migrate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # NEXT_PUBLIC_* vars are inlined at build time by Next.js
+      - name: Build with OpenNext
+        run: npm run build:worker
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_STRAVA_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_STRAVA_CLIENT_ID }}
+          NEXT_PUBLIC_APP_URL: https://kmtracker.dev-haucx.workers.dev
+
+      - name: Deploy with Wrangler
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
