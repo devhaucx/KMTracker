@@ -108,41 +108,26 @@ export default function AdminDepartmentsClient({ departments: initialDepartments
   )
 
   return (
-    <div className="container" style={{ padding: '2rem 1.5rem 4rem' }}>
+    <div className="container" style={{ padding: '1.25rem 1.25rem 4rem' }}>
       <div
         style={{
           display: 'flex',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
-          gap: '1rem',
-          marginBottom: '2rem',
+          gap: '0.75rem',
+          marginBottom: '1.25rem',
         }}
       >
         <div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              marginBottom: '0.3rem',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              color: 'var(--color-primary)',
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-            }}
-          >
-            <Building2 size={14} /> Cơ cấu tổ chức
-          </div>
-          <h1 style={{ fontSize: '1.625rem', fontWeight: 700 }}>Quản Lý Phòng Ban</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.2rem' }}>
-            Khai báo các đơn vị phòng ban, thiết lập mã đại diện và màu sắc trên bảng xếp hạng đồng đội.
+          <h1 className="hide-mobile" style={{ fontSize: '1.5rem', fontWeight: 700 }}>Danh Sách Phòng Ban</h1>
+          <p className="hide-mobile" style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.15rem' }}>
+            Quản lý tên phòng ban, mã đơn vị và màu sắc nhận diện trên bảng xếp hạng.
           </p>
         </div>
 
-        <button onClick={openCreateModal} className="btn btn-primary" style={{ gap: '0.4rem' }}>
-          <Plus size={16} /> Thêm phòng ban
+        <button onClick={openCreateModal} className="btn btn-primary btn-sm mobile-full-width" style={{ gap: '0.35rem' }}>
+          <Plus size={15} /> Thêm phòng ban mới
         </button>
       </div>
 

@@ -185,7 +185,7 @@ function LandingPage({ competition, stats }: { competition: Competition | null; 
           </div>
         </div>
         <div className="mobile-grid-1col" style={{ '--grid-min': '260px', maxWidth: 560, margin: '0 auto' } as React.CSSProperties}>
-          <Link href="/api/auth/strava" className="card" style={{
+          <a href="/api/auth/strava" className="card" style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
             padding: '1.5rem', gap: '0.6rem', cursor: 'pointer', textDecoration: 'none',
             borderColor: 'var(--color-primary-ring)', transition: 'border-color 0.15s, box-shadow 0.15s',
@@ -197,7 +197,7 @@ function LandingPage({ competition, stats }: { competition: Competition | null; 
             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               Đăng nhập bằng tài khoản Strava để tham gia thi đấu
             </p>
-          </Link>
+          </a>
           <Link href="/admin/login" className="card" style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
             padding: '1.5rem', gap: '0.6rem', cursor: 'pointer', textDecoration: 'none',

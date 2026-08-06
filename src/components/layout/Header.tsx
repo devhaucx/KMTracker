@@ -106,9 +106,9 @@ export default function Header({ user }: HeaderProps) {
                 </span>
               </Link>
             ) : (
-              <Link href="/api/auth/strava" className="btn btn-primary btn-sm" style={{ gap: '0.35rem' }}>
+              <a href="/api/auth/strava" className="btn btn-primary btn-sm" style={{ gap: '0.35rem' }}>
                 <Zap size={14} /> <span className="hide-mobile">Tham gia</span>
-              </Link>
+              </a>
             )}
           </div>
         </div>

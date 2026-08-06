@@ -132,9 +132,9 @@ export default function JoinClient({ code, competition, sports, departments }: P
           </div>
         )}
 
-        <Link href={`/api/auth/strava?invite=${code}&dept=${selectedDept}`} className="btn btn-primary btn-lg" style={{ width: '100%', justifyContent: 'center' }}>
+        <a href={`/api/auth/strava?invite=${code}&dept=${selectedDept}`} className="btn btn-primary btn-lg" style={{ width: '100%', justifyContent: 'center' }}>
           <Zap size={18} /> Tham gia bằng Strava <ArrowRight size={16} />
-        </Link>
+        </a>
       </div>
     </div>
   )

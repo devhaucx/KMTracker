@@ -5,7 +5,7 @@ import Link from 'next/link'
 import {
   Shield, Download, Copy, Check,
   AlertTriangle, Users, Building2, Trophy,
-  XCircle, Eye, ArrowRight, ExternalLink
+  XCircle, ArrowRight, ExternalLink, Plus
 } from 'lucide-react'
 
 interface AdminDashboardClientProps {
@@ -40,84 +40,80 @@ export default function AdminDashboardClient({ competition, stats, suspiciousAct
   }
 
   const STAT_CARDS = [
-    { icon: <Users size={18} style={{ color: 'var(--color-primary)' }} />,  label: 'Vận động viên',   value: `${stats?.participant_count ?? stats?.participantCount ?? 0}`,  sub: 'người tham gia' },
-    { icon: <Building2 size={18} style={{ color: 'var(--sport-swim)' }} />, label: 'Phòng ban',        value: `${stats?.department_count ?? stats?.departmentCount ?? 0}`,   sub: 'đơn vị' },
-    { icon: <Trophy size={18} style={{ color: 'var(--rank-gold)' }} />,     label: 'Tổng KM quy đổi', value: `${stats?.total_converted_km ?? stats?.totalKm ?? 0}`, sub: 'km toàn giải' },
-    { icon: <AlertTriangle size={18} style={{ color: 'var(--color-danger)' }} />, label: 'Bài tập nghi vấn', value: `${stats?.suspicious_count ?? stats?.suspiciousCount ?? 0}`, sub: 'cần kiểm duyệt', danger: true },
+    { icon: <Users size={16} style={{ color: 'var(--color-primary)' }} />,  label: 'Vận động viên',   value: `${stats?.participant_count ?? stats?.participantCount ?? 0}`,  sub: 'người tham gia' },
+    { icon: <Building2 size={16} style={{ color: 'var(--sport-swim)' }} />, label: 'Phòng ban',        value: `${stats?.department_count ?? stats?.departmentCount ?? 0}`,   sub: 'đơn vị' },
+    { icon: <Trophy size={16} style={{ color: 'var(--rank-gold)' }} />,     label: 'Tổng KM quy đổi', value: `${stats?.total_converted_km ?? stats?.totalKm ?? 0}`, sub: 'km toàn giải' },
+    { icon: <AlertTriangle size={16} style={{ color: 'var(--color-danger)' }} />, label: 'Bài tập nghi vấn', value: `${stats?.suspicious_count ?? stats?.suspiciousCount ?? 0}`, sub: 'cần kiểm duyệt', danger: true },
   ]
 
   return (
-    <div className="container" style={{ padding: '1.5rem 1.5rem 4rem' }}>
+    <div className="container" style={{ padding: '1.25rem 1.25rem 4rem' }}>
 
-      {/* Page header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '2rem' }}>
+      {/* Page header - compact on mobile */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1.25rem' }}>
         <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.3rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-warning)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
-            <Shield size={14} /> Trang quản trị · Bảng Tổng Quan
-          </div>
-          <h1 style={{ fontSize: '1.625rem', fontWeight: 700 }}>Tổng Quan Hệ Thống</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.2rem' }}>
-            {competition ? `${competition.name} · ${competition.start_date} – ${competition.end_date}` : 'Chưa có giải đấu'}
+          <h1 className="hide-mobile" style={{ fontSize: '1.5rem', fontWeight: 700 }}>Tổng Quan Hệ Thống</h1>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+            {competition ? `${competition.name} (${competition.invite_code})` : 'Chưa có giải đấu active'}
           </p>
         </div>
-        <div className="mobile-stack" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-          <button onClick={exportCSV} className="btn btn-secondary btn-sm" style={{ gap: '0.35rem' }}>
-            <Download size={14} /> Xuất báo cáo CSV
+        <div style={{ display: 'flex', gap: '0.4rem', width: '100%', maxWidth: 'max-content' }} className="mobile-full-width">
+          <button onClick={exportCSV} className="btn btn-secondary btn-sm" style={{ gap: '0.35rem', flex: 1 }}>
+            <Download size={14} /> <span className="hide-mobile">Xuất báo cáo</span> CSV
           </button>
-          <Link href="/admin/competitions/new" className="btn btn-primary btn-sm" style={{ gap: '0.35rem' }}>
-            Tạo giải đấu mới
+          <Link href="/admin/competitions/new" className="btn btn-primary btn-sm" style={{ gap: '0.35rem', flex: 1 }}>
+            <Plus size={14} /> Tạo giải đấu
           </Link>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="stats-grid-mobile" style={{ marginBottom: '2rem' }}>
+      {/* Stats Grid - 2x2 compact on mobile */}
+      <div className="stats-grid-mobile" style={{ marginBottom: '1.25rem' }}>
         {STAT_CARDS.map(s => (
-          <div key={s.label} className="stat-card" style={s.danger ? { borderTop: '3px solid var(--color-danger)' } : { borderTop: '3px solid var(--border-base)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}>
+          <div key={s.label} className="stat-card" style={{ padding: '0.75rem 0.85rem', ...(s.danger ? { borderTop: '3px solid var(--color-danger)' } : { borderTop: '3px solid var(--border-base)' }) }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.25rem' }}>
               {s.icon}
-              <div className="stat-label" style={{ margin: 0 }}>{s.label}</div>
+              <div className="stat-label" style={{ margin: 0, fontSize: '0.75rem' }}>{s.label}</div>
             </div>
-            <div className="stat-value" style={s.danger ? { color: 'var(--color-danger)' } : {}}>{s.value}</div>
-            <div className="stat-sub">{s.sub}</div>
+            <div className="stat-value" style={{ fontSize: '1.35rem', ...(s.danger ? { color: 'var(--color-danger)' } : {}) }}>{s.value}</div>
+            <div className="stat-sub" style={{ fontSize: '0.7rem', marginTop: '0.15rem' }}>{s.sub}</div>
           </div>
         ))}
       </div>
 
-      {/* Invite link card */}
+      {/* Invite link card - ultra compact on mobile */}
       {competition && (
-      <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
-          <Trophy size={16} style={{ color: 'var(--color-primary)' }} />
-          <h2 style={{ fontSize: '1rem', fontWeight: 700 }}>Link Mời Đăng Ký Tham Gia</h2>
+      <div className="card" style={{ padding: '1rem', marginBottom: '1.25rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <Trophy size={15} style={{ color: 'var(--color-primary)' }} />
+            <h2 style={{ fontSize: '0.9rem', fontWeight: 700 }}>Link Mời Đăng Ký</h2>
+          </div>
           <span className="badge badge-blue">{competition.invite_code}</span>
         </div>
-        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-          Gửi link mời riêng này cho cán bộ nhân viên để đăng ký tham gia giải đấu qua tài khoản Strava.
-        </p>
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <input type="text" readOnly value={inviteUrl} className="input"
-            style={{ flex: 1, minWidth: 260, fontFamily: 'var(--font-mono)', fontSize: '0.85rem', color: 'var(--color-primary)', fontWeight: 600 }}
+            style={{ flex: 1, minWidth: 200, fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 600, padding: '0.4rem 0.6rem' }}
           />
-          <button onClick={copyLink} className={`btn ${copiedLink ? 'btn-secondary' : 'btn-primary'} mobile-full-width`}>
-            {copiedLink ? <><Check size={15} /> Đã copy link!</> : <><Copy size={15} /> Copy link mời</>}
+          <button onClick={copyLink} className={`btn ${copiedLink ? 'btn-secondary' : 'btn-primary'} btn-sm mobile-full-width`} style={{ gap: '0.35rem' }}>
+            {copiedLink ? <><Check size={14} /> Đã copy!</> : <><Copy size={14} /> Copy link</>}
           </button>
         </div>
       </div>
       )}
 
       {/* Suspicious activities section */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <h2 style={{ fontSize: '1.0625rem', fontWeight: 700 }}>Bài tập nghi vấn cần kiểm duyệt</h2>
-          <span className="badge status-err">{suspiciousActivities.length} bài</span>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <h2 style={{ fontSize: '0.95rem', fontWeight: 700 }}>Bài tập nghi vấn</h2>
+          <span className="badge status-err" style={{ fontSize: '0.75rem' }}>{suspiciousActivities.length} bài</span>
         </div>
-        <Link href="/admin/activities" style={{ fontSize: '0.825rem', color: 'var(--color-primary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-          Xem tất cả bài tập <ArrowRight size={13} />
+        <Link href="/admin/activities" style={{ fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+          Xem tất cả <ArrowRight size={12} />
         </Link>
       </div>
 
-      <div className="desktop-table-view" style={{ marginBottom: '2rem' }}>
+      <div className="desktop-table-view" style={{ marginBottom: '1.5rem' }}>
         <div className="table-wrapper">
           <table className="table">
             <thead>
@@ -132,72 +128,86 @@ export default function AdminDashboardClient({ competition, stats, suspiciousAct
               </tr>
             </thead>
             <tbody>
-              {suspiciousActivities.map((row, i) => (
-                <tr key={i}>
-                  <td style={{ fontWeight: 600 }}>{row.name}</td>
-                  <td><span className="badge badge-neutral">{row.dept}</span></td>
-                  <td>{row.sport}</td>
-                  <td style={{ textAlign: 'right', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{row.actual}</td>
-                  <td style={{ textAlign: 'center', fontSize: '0.875rem', fontVariantNumeric: 'tabular-nums' }}>{row.pace}</td>
-                  <td>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem', fontWeight: 600, color: row.severity === 'error' ? 'var(--color-danger)' : 'var(--color-warning)' }}>
-                      <AlertTriangle size={13} /> {row.warning}
-                    </span>
-                  </td>
-                  <td>
-                    <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem' }}>
-                      <a href={row.strava_url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm" style={{ gap: '0.3rem' }} title="Mở Strava">
-                        <ExternalLink size={13} /> Strava ↗
-                      </a>
-                      <Link href="/admin/activities" className="btn btn-sm" style={{ gap: '0.3rem', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger-border)' }}>
-                        <XCircle size={13} /> Kiểm duyệt
-                      </Link>
-                    </div>
+              {suspiciousActivities.length === 0 ? (
+                <tr>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-tertiary)' }}>
+                    Không có bài tập nghi vấn nào.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                suspiciousActivities.map((row, i) => (
+                  <tr key={i}>
+                    <td style={{ fontWeight: 600 }}>{row.name}</td>
+                    <td><span className="badge badge-neutral">{row.dept}</span></td>
+                    <td>{row.sport}</td>
+                    <td style={{ textAlign: 'right', fontSize: '0.875rem', color: 'var(--text-secondary)' }}>{row.actual}</td>
+                    <td style={{ textAlign: 'center', fontSize: '0.875rem', fontVariantNumeric: 'tabular-nums' }}>{row.pace}</td>
+                    <td>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.8rem', fontWeight: 600, color: row.severity === 'error' ? 'var(--color-danger)' : 'var(--color-warning)' }}>
+                        <AlertTriangle size={13} /> {row.warning}
+                      </span>
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: '0.4rem' }}>
+                        <a href={row.strava_url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm" style={{ gap: '0.3rem' }} title="Mở Strava">
+                          <ExternalLink size={13} /> Strava ↗
+                        </a>
+                        <Link href="/admin/activities" className="btn btn-sm" style={{ gap: '0.3rem', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger-border)' }}>
+                          <XCircle size={13} /> Kiểm duyệt
+                        </Link>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      <div className="mobile-card-view" style={{ marginBottom: '2rem' }}>
-        {suspiciousActivities.map((row, i) => (
-          <div key={i} className="card" style={{ padding: '1rem', marginBottom: '0.75rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-              <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>{row.name}</span>
-              <span className="badge status-err" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-                <AlertTriangle size={12} /> Nghi vấn
-              </span>
-            </div>
-            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
-              <span className="badge badge-neutral">{row.dept}</span>
-              <span className="badge badge-neutral">{row.sport}</span>
-            </div>
-            <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>
-              <span>Thực tế: <strong style={{ color: 'var(--text-primary)' }}>{row.actual}</strong></span>
-              <span>Pace: <strong style={{ color: 'var(--text-primary)' }}>{row.pace}</strong></span>
-            </div>
-            <div style={{ fontSize: '0.825rem', fontWeight: 600, color: row.severity === 'error' ? 'var(--color-danger)' : 'var(--color-warning)', marginBottom: '0.75rem' }}>
-              {row.warning}
-            </div>
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
-              <a href={row.strava_url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm" style={{ gap: '0.3rem', flex: 1 }}>
-                <ExternalLink size={13} /> Strava
-              </a>
-              <Link href="/admin/activities" className="btn btn-sm" style={{ gap: '0.3rem', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger-border)', flex: 1 }}>
-                <XCircle size={13} /> Kiểm duyệt
-              </Link>
-            </div>
+      <div className="mobile-card-view" style={{ marginBottom: '1.5rem' }}>
+        {suspiciousActivities.length === 0 ? (
+          <div className="card" style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.85rem' }}>
+            Không có bài tập nghi vấn nào.
           </div>
-        ))}
+        ) : (
+          suspiciousActivities.map((row, i) => (
+            <div key={i} className="card" style={{ padding: '0.85rem', marginBottom: '0.65rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.35rem' }}>
+                <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{row.name}</span>
+                <span className="badge status-err" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.2rem', fontSize: '0.7rem' }}>
+                  <AlertTriangle size={11} /> Nghi vấn
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: '0.35rem', flexWrap: 'wrap', marginBottom: '0.35rem' }}>
+                <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>{row.dept}</span>
+                <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>{row.sport}</span>
+              </div>
+              <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.8rem', color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
+                <span>Thực tế: <strong style={{ color: 'var(--text-primary)' }}>{row.actual}</strong></span>
+                <span>Pace: <strong style={{ color: 'var(--text-primary)' }}>{row.pace}</strong></span>
+              </div>
+              <div style={{ fontSize: '0.775rem', fontWeight: 600, color: row.severity === 'error' ? 'var(--color-danger)' : 'var(--color-warning)', marginBottom: '0.6rem' }}>
+                {row.warning}
+              </div>
+              <div style={{ display: 'flex', gap: '0.4rem' }}>
+                <a href={row.strava_url} target="_blank" rel="noopener noreferrer" className="btn btn-secondary btn-sm" style={{ gap: '0.25rem', flex: 1, padding: '0.35rem 0.5rem', fontSize: '0.775rem' }}>
+                  <ExternalLink size={12} /> Strava
+                </a>
+                <Link href="/admin/activities" className="btn btn-sm" style={{ gap: '0.25rem', background: 'var(--color-danger-bg)', color: 'var(--color-danger)', border: '1px solid var(--color-danger-border)', flex: 1, padding: '0.35rem 0.5rem', fontSize: '0.775rem' }}>
+                  <XCircle size={12} /> Duyệt
+                </Link>
+              </div>
+            </div>
+          ))
+        )}
       </div>
 
       {/* Participants List */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.85rem' }}>
-        <h2 style={{ fontSize: '1.0625rem', fontWeight: 700 }}>Top VĐV Dẫn Đầu</h2>
-        <Link href="/admin/users" style={{ fontSize: '0.825rem', color: 'var(--color-primary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-          Quản lý {stats?.participant_count ?? stats?.participantCount ?? 0} người dùng <ArrowRight size={13} />
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.65rem' }}>
+        <h2 style={{ fontSize: '0.95rem', fontWeight: 700 }}>Top VĐV Dẫn Đầu</h2>
+        <Link href="/admin/users" style={{ fontSize: '0.8rem', color: 'var(--color-primary)', fontWeight: 600, display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}>
+          Quản lý {stats?.participant_count ?? stats?.participantCount ?? 0} VĐV <ArrowRight size={12} />
         </Link>
       </div>
 
@@ -241,22 +251,15 @@ export default function AdminDashboardClient({ competition, stats, suspiciousAct
         {topAthletes.map((p, i) => {
           const suspicious = suspiciousActivities.some(s => s.name === p.full_name)
           return (
-            <div key={p.user_id || i} className="card" style={{ padding: '1rem', marginBottom: '0.75rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-tertiary)', minWidth: 28 }}>#{i + 1}</span>
-                <span style={{ fontWeight: 700, fontSize: '0.95rem', flex: 1 }}>{p.full_name}</span>
+            <div key={p.user_id || i} className="card" style={{ padding: '0.75rem 0.85rem', marginBottom: '0.5rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.35rem' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 800, color: i < 3 ? 'var(--color-primary)' : 'var(--text-tertiary)', minWidth: 24 }}>#{i + 1}</span>
+                <span style={{ fontWeight: 700, fontSize: '0.875rem', flex: 1 }}>{p.full_name}</span>
+                <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>{p.department_name}</span>
               </div>
-              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.5rem' }}>
-                <span className="badge badge-neutral">{p.department_name}</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{p.activity_count} bài tập</span>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+                <span style={{ color: 'var(--text-secondary)' }}>{p.activity_count} bài tập</span>
                 <span style={{ fontWeight: 700, color: 'var(--color-primary)' }}>{Number(p.total_converted_km).toFixed(1)} km</span>
-              </div>
-              <div style={{ marginTop: '0.5rem' }}>
-                {suspicious
-                  ? <span className="badge status-err">⚠ Cần đối soát</span>
-                  : <span className="badge status-ok">✓ Hợp lệ</span>}
               </div>
             </div>
           )

@@ -41,7 +41,7 @@ export async function getSuspiciousActivities(limit = 10) {
     .from('activities')
     .select(`
       *,
-      users (full_name, avatar_url, strava_athlete_id)
+      users (full_name, avatar_url, strava_athlete_id, departments (name, code, avatar_color))
     `)
     .eq('is_valid', false)
     .order('start_date', { ascending: false })
@@ -55,8 +55,7 @@ export async function getRecentActivities(limit = 50) {
     .from('activities')
     .select(`
       *,
-      users (full_name, avatar_url, strava_athlete_id),
-      departments!inner (name, code, avatar_color)
+      users (full_name, avatar_url, strava_athlete_id, departments (name, code, avatar_color))
     `)
     .order('start_date', { ascending: false })
     .limit(limit)

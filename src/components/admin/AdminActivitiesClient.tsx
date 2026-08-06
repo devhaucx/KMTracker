@@ -303,10 +303,10 @@ export default function AdminActivitiesClient({
 
       {/* Audit Banner */}
       <div
-        className="card"
+        className="card admin-hide-mobile"
         style={{
           padding: '1rem 1.25rem',
-          marginBottom: '1.5rem',
+          marginBottom: '1.25rem',
           background: 'var(--bg-subtle)',
           borderColor: 'var(--border-base)',
           display: 'flex',
@@ -323,38 +323,41 @@ export default function AdminActivitiesClient({
 
       {/* Filter and Search Bar */}
       <div
-        className="card mobile-stack"
+        className="card"
         style={{
-          padding: '1rem 1.25rem',
-          marginBottom: '1.5rem',
-          justifyContent: 'space-between',
+          padding: '0.85rem 1rem',
+          marginBottom: '1rem',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '0.75rem',
         }}
       >
         {/* Search */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, minWidth: 260 }}>
-          <Search size={16} style={{ color: 'var(--text-tertiary)' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', width: '100%' }}>
+          <Search size={16} style={{ color: 'var(--text-tertiary)', flexShrink: 0 }} />
           <input
             type="text"
-            placeholder="Tìm theo tên VĐV, tên bài tập hoặc phòng ban..."
+            placeholder="Tìm VĐV, bài tập, phòng ban..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="input"
-            style={{ border: 'none', background: 'transparent', padding: '0.25rem 0' }}
+            style={{ border: 'none', background: 'transparent', padding: '0.2rem 0', width: '100%', fontSize: '0.875rem' }}
           />
         </div>
 
         {/* Status Filter Pills */}
-        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '0.35rem', overflowX: 'auto', paddingBottom: '0.15rem', scrollbarWidth: 'none' }}>
           {[
             { id: 'all', label: `Tất cả (${counts.all})` },
             { id: 'suspicious', label: `Nghi vấn (${counts.suspicious})` },
             { id: 'valid', label: `Hợp lệ (${counts.valid})` },
-            { id: 'invalid', label: `Đã từ chối (${counts.invalid})` },
+            { id: 'invalid', label: `Từ chối (${counts.invalid})` },
           ].map((tab) => (
             <button
               key={tab.id}
               onClick={() => setStatusFilter(tab.id as typeof statusFilter)}
               className={`filter-pill ${statusFilter === tab.id ? 'active' : ''}`}
+              style={{ fontSize: '0.775rem', padding: '0.3rem 0.75rem', whiteSpace: 'nowrap' }}
             >
               {tab.label}
             </button>

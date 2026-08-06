@@ -81,42 +81,33 @@ export default function AdminReportsClient({ competition, stats, individualLeade
   const topWalk = getTopBySport('Walk')
 
   return (
-    <div className="container" style={{ padding: '1.5rem 1.5rem 4rem' }}>
+    <div className="container" style={{ padding: '1.25rem 1.25rem 4rem' }}>
       {/* Header */}
       <div
         style={{
           display: 'flex',
-          alignItems: 'flex-start',
+          alignItems: 'center',
           justifyContent: 'space-between',
           flexWrap: 'wrap',
-          gap: '1rem',
-          marginBottom: '2rem',
+          gap: '0.75rem',
+          marginBottom: '1.25rem',
         }}
       >
         <div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              marginBottom: '0.3rem',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              color: 'var(--color-primary)',
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-            }}
-          >
-            <FileText size={14} /> Tổng hợp dữ liệu
-          </div>
-          <h1 style={{ fontSize: '1.625rem', fontWeight: 700 }}>Báo Cáo & Thống Kê Giải Đấu</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.2rem' }}>
-            {competitionName} · Dữ liệu tự động cập nhật từ Strava
+          <h1 className="hide-mobile" style={{ fontSize: '1.5rem', fontWeight: 700 }}>Báo Cáo & Thống Kê Giải Đấu</h1>
+          <p className="hide-mobile" style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.15rem' }}>
+            Tổng hợp dữ liệu kết quả thi đấu, xuất báo cáo CSV phục vụ trao giải.
           </p>
         </div>
 
-        <button onClick={exportCSV} disabled={downloading} className="btn btn-primary mobile-full-width" style={{ gap: '0.4rem' }}>
-          <Download size={16} /> {downloading ? 'Đang xuất CSV...' : 'Xuất CSV báo cáo'}
+        <button
+          onClick={exportCSV}
+          disabled={downloading}
+          className="btn btn-primary btn-sm mobile-full-width"
+          style={{ gap: '0.35rem' }}
+        >
+          <Download size={15} />
+          {downloading ? 'Đang xuất CSV…' : 'Xuất dữ liệu CSV trao giải'}
         </button>
       </div>
 

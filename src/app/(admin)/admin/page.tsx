@@ -3,9 +3,11 @@ import { getAdminStats, getSuspiciousActivities, getTopAthletes } from '@/lib/qu
 import AdminDashboardClient from '@/components/admin/AdminDashboardClient'
 import { requireAdmin } from '@/lib/auth/session'
 
+import { getAppUrl } from '@/lib/utils/url'
+
 export default async function AdminPage() {
   await requireAdmin()
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://kmtracker.dev-haucx.workers.dev'
+  const appUrl = getAppUrl()
 
   const competition = await getActiveCompetition()
   if (!competition) {
@@ -59,7 +61,7 @@ export default async function AdminPage() {
 
     return {
       name: a.users?.full_name || 'Không rõ',
-      dept: a.departments?.name || '—',
+      dept: a.users?.departments?.name || '—',
       sport: sportIcons[a.sport_type] || a.sport_type,
       actual: `${a.distance_actual_km?.toFixed(1) ?? '0'} km`,
       pace: paceDisplay,

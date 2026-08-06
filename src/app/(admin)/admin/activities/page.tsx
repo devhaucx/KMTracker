@@ -56,7 +56,7 @@ export default async function AdminActivitiesPage() {
     const paceOrSpeedStr = formatPaceOrSpeed(sportType, row.pace_or_speed)
     const startDateStr = formatDate(row.start_date)
     const runnerName = row.users?.full_name ?? 'Unknown'
-    const deptName = row.departments?.name ?? 'N/A'
+    const deptName = row.users?.departments?.name ?? 'N/A'
 
     return {
       id: row.id,

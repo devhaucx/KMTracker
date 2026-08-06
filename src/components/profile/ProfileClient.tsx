@@ -74,13 +74,13 @@ export default function ProfileClient({ user, departments }: { user: UserProfile
         </form>
       </div>
 
-      <Link href="/api/auth/logout" className="btn btn-sm" style={{
+      <a href="/api/auth/logout" className="btn btn-sm" style={{
         width: '100%', justifyContent: 'center', marginTop: '1rem',
         color: 'var(--color-danger)', borderColor: 'var(--color-danger-border)',
         background: 'transparent', gap: '0.4rem',
       }}>
         <LogOut size={15} /> Đăng xuất
-      </Link>
+      </a>
     </div>
   )
 }

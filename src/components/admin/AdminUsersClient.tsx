@@ -133,31 +133,12 @@ export default function AdminUsersClient({ users: initialUsers, departments }: P
   const stravaConnectedCount = users.filter((u) => u.strava_athlete_id).length
 
   return (
-    <div className="container" style={{ padding: '1.5rem 1.5rem 4rem' }}>
-      <div
-        style={{
-          marginBottom: '1.5rem',
-        }}
-      >
+    <div className="container" style={{ padding: '1.25rem 1.25rem 4rem' }}>
+      <div style={{ marginBottom: '1rem' }}>
         <div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.4rem',
-              marginBottom: '0.3rem',
-              fontSize: '0.8rem',
-              fontWeight: 600,
-              color: 'var(--color-primary)',
-              letterSpacing: '0.04em',
-              textTransform: 'uppercase',
-            }}
-          >
-            <Users size={14} /> Quản lý tài khoản &amp; Khiếu nại
-          </div>
-          <h1 style={{ fontSize: '1.625rem', fontWeight: 700 }}>Đối Soát Strava ID &amp; Xử Lý Khiếu Nại VĐV</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.2rem' }}>
-            Xem hồ sơ Strava cá nhân, gán phòng ban, loại bỏ tài khoản ảo hoặc khôi phục lại VĐV khi khiếu nại thành công.
+          <h1 className="hide-mobile" style={{ fontSize: '1.5rem', fontWeight: 700 }}>Danh Sách Người Dùng & VĐV</h1>
+          <p className="hide-mobile" style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.15rem' }}>
+            Quản lý thông tin VĐV, gán phòng ban, đối soát Strava ID và xử lý khiếu nại.
           </p>
         </div>
       </div>

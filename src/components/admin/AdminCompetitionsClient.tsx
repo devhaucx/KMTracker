@@ -141,14 +141,14 @@ export default function AdminCompetitionsClient({ competitions }: { competitions
           >
             <Trophy size={14} /> Quản lý giải đấu
           </div>
-          <h1 style={{ fontSize: '1.625rem', fontWeight: 700 }}>Danh Sách Cuộc Thi</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginTop: '0.2rem' }}>
+          <h1 className="hide-mobile" style={{ fontSize: '1.5rem', fontWeight: 700 }}>Danh Sách Cuộc Thi</h1>
+          <p className="hide-mobile" style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.15rem' }}>
             Tạo mới, thiết lập quy tắc tính điểm và theo dõi trạng thái các cuộc thi trong doanh nghiệp.
           </p>
         </div>
 
-        <Link href="/admin/competitions/new" className="btn btn-primary mobile-full-width" style={{ gap: '0.4rem' }}>
-          <Plus size={16} /> Tạo cuộc thi mới
+        <Link href="/admin/competitions/new" className="btn btn-primary btn-sm mobile-full-width" style={{ gap: '0.35rem' }}>
+          <Plus size={15} /> Tạo cuộc thi mới
         </Link>
       </div>
 

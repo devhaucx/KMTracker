@@ -676,9 +676,11 @@ button, input, select, textarea { font-family: inherit; }
   font-weight: 700;
 }
 
-/* Admin content needs bottom padding so bottom nav doesn't cover it */
+/* Admin content needs compact padding on mobile so content fits cleanly */
 @media (max-width: 768px) {
-  .admin-content { padding-bottom: 80px !important; }
+  .admin-content { padding: 0.85rem 0.85rem 5.5rem !important; }
+  .admin-hide-mobile { display: none !important; }
+  .admin-subtitle-mobile { font-size: 0.8rem !important; margin-top: 0.15rem !important; }
 }
 
 /* Admin bottom sheet (for "More" tab) */

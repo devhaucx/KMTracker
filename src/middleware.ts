@@ -32,18 +32,40 @@ export async function middleware(request: NextRequest) {
 
   const sessionCookie = request.cookies.get(SESSION_COOKIE)?.value
 
+  // Auto-redirect already authenticated admin visiting /admin/login to /admin
+  if (pathname === '/admin/login' && hasValidSessionStructure(sessionCookie)) {
+    return NextResponse.redirect(new URL('/admin', request.url))
+  }
+
   if (isAdminRoute(pathname)) {
     if (!hasValidSessionStructure(sessionCookie)) {
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
-    return NextResponse.next()
+    const requestHeaders = new Headers(request.headers)
+    if (sessionCookie) {
+      requestHeaders.set('x-tm-session', sessionCookie)
+    }
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    })
   }
 
   if (isAuthRoute(pathname) && !hasValidSessionStructure(sessionCookie)) {
     return NextResponse.redirect(new URL('/?auth=required', request.url))
   }
 
-  return NextResponse.next()
+  const requestHeaders = new Headers(request.headers)
+  if (sessionCookie) {
+    requestHeaders.set('x-tm-session', sessionCookie)
+  }
+
+  return NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  })
 }
 
 export const config = {

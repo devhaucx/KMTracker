@@ -1,27 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useActionState } from 'react'
 import Link from 'next/link'
 import { Shield, Mail, Lock, ArrowRight, ArrowLeft } from 'lucide-react'
 import { adminLogin } from './actions'
 
 export default function AdminLoginPage() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-
-  async function submit(formData: FormData) {
-    setLoading(true); setError('')
-    try {
-      const result = await adminLogin(formData)
-      if (result?.error) {
-        setError(result.error)
-        setLoading(false)
-      }
-    } catch {
-      setError('Đăng nhập thất bại. Vui lòng thử lại.')
-      setLoading(false)
-    }
-  }
+  const [state, formAction, isPending] = useActionState(adminLogin, null)
 
   return (
     <div style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1.5rem' }}>
@@ -38,27 +23,39 @@ export default function AdminLoginPage() {
         </div>
 
         <div className="card" style={{ padding: '1.75rem 2rem' }}>
-          <form action={submit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <form action={formAction} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             <div>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
                 <Mail size={13} style={{ color: 'var(--text-tertiary)' }} /> Email
               </label>
-              <input type="email" name="email" required placeholder="admin@company.com" className="input" />
+              <input
+                type="email"
+                name="email"
+                required
+                placeholder="admin@company.com"
+                className="input"
+              />
             </div>
 
             <div>
               <label style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', fontWeight: 600, fontSize: '0.85rem', marginBottom: '0.4rem' }}>
                 <Lock size={13} style={{ color: 'var(--text-tertiary)' }} /> Mật khẩu
               </label>
-              <input type="password" name="password" required placeholder="••••••••" className="input" />
+              <input
+                type="password"
+                name="password"
+                required
+                placeholder="••••••••"
+                className="input"
+              />
             </div>
 
-            {error && (
-              <p style={{ fontSize: '0.85rem', color: 'var(--color-danger)', fontWeight: 500 }}>{error}</p>
+            {state?.error && (
+              <p style={{ fontSize: '0.85rem', color: 'var(--color-danger)', fontWeight: 500 }}>{state.error}</p>
             )}
 
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.65rem', marginTop: '0.25rem' }} disabled={loading}>
-              {loading ? 'Đang đăng nhập…' : <><ArrowRight size={16} /> Truy cập trang quản trị</>}
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '0.65rem', marginTop: '0.25rem' }} disabled={isPending}>
+              {isPending ? 'Đang đăng nhập…' : <><ArrowRight size={16} /> Truy cập trang quản trị</>}
             </button>
           </form>
         </div>

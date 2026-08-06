@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getAppUrl } from '@/lib/utils/url'
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const error   = searchParams.get('error')
   const code    = searchParams.get('code')
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `${request.nextUrl.protocol}//${request.nextUrl.host}`
+  const baseUrl = getAppUrl(request)
 
   if (error) {
     return NextResponse.redirect(`${baseUrl}/?error=strava_auth_cancelled`)

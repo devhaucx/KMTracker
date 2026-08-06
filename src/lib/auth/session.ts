@@ -1,16 +1,20 @@
-import { createServerClient } from '@supabase/ssr'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import type { UserProfile, UserRole } from '@/lib/supabase/types'
 
 const SESSION_COOKIE = 'tm_session'
-const SESSION_SECRET = process.env.SESSION_SECRET || 'tm-tracker-dev-secret-change-in-prod'
+const DEFAULT_SESSION_SECRET = 'tm-tracker-dev-secret-change-in-prod-2026'
+
+function getSessionSecret(): string {
+  return process.env.SESSION_SECRET || DEFAULT_SESSION_SECRET
+}
 
 async function hmacSign(payload: string): Promise<string> {
+  const secret = getSessionSecret()
   const enc = new TextEncoder()
   const key = await crypto.subtle.importKey(
     'raw',
-    enc.encode(SESSION_SECRET),
+    enc.encode(secret),
     { name: 'HMAC', hash: 'SHA-256' },
     false,
     ['sign']
@@ -46,20 +50,22 @@ export async function setSessionCookie(userId: string, response: Response) {
   const token = await createSessionToken(userId)
   response.headers.append(
     'Set-Cookie',
-    `${SESSION_COOKIE}=${token}; HttpOnly; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`
+    `${SESSION_COOKIE}=${token}; HttpOnly; Path=/; Max-Age=${60 * 60 * 24 * 30}; SameSite=Lax; Secure`
   )
 }
 
 export function clearSessionCookie(response: Response) {
   response.headers.append(
     'Set-Cookie',
-    `${SESSION_COOKIE}=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax`
+    `${SESSION_COOKIE}=; HttpOnly; Path=/; Max-Age=0; SameSite=Lax; Secure`
   )
 }
 
 export async function getCurrentUser(): Promise<UserProfile | null> {
   const cookieStore = await cookies()
-  const sessionCookie = cookieStore.get(SESSION_COOKIE)?.value
+  const headerStore = await headers()
+  const sessionCookie = cookieStore.get(SESSION_COOKIE)?.value || headerStore.get('x-tm-session') || null
+
   if (!sessionCookie) return null
 
   const userId = await verifySessionToken(sessionCookie)
@@ -68,11 +74,13 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
   const { createAdminClient } = await import('@/lib/supabase/admin')
   const admin = createAdminClient()
 
-  const { data: profile } = await admin
+  const { data: profile, error } = await admin
     .from('users')
     .select('*')
     .eq('id', userId)
     .single()
+
+  if (error || !profile) return null
 
   return profile as UserProfile | null
 }
@@ -80,7 +88,7 @@ export async function getCurrentUser(): Promise<UserProfile | null> {
 export async function requireAuth(): Promise<UserProfile> {
   const user = await getCurrentUser()
   if (!user) {
-    redirect('/?auth=required')
+    redirect('/admin/login?error=unauthenticated')
   }
   return user
 }
@@ -101,7 +109,7 @@ export async function getCurrentUserIdFromRequest(request: Request): Promise<str
       return [k, v.join('=')]
     })
   )
-  const token = cookies[SESSION_COOKIE]
+  const token = cookies[SESSION_COOKIE] || request.headers.get('x-tm-session')
   if (!token) return null
   return verifySessionToken(token)
 }
