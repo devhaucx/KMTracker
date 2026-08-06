@@ -560,7 +560,7 @@ export default function AdminActivitiesClient({
         {/* Mobile Card View */}
         <div className="mobile-card-view">
           {filteredActivities.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '3rem 1rem', color: 'var(--text-tertiary)' }}>
+            <div className="card" style={{ padding: '1.5rem', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.8rem' }}>
               Không tìm thấy bài tập nào phù hợp.
             </div>
           ) : (
@@ -577,98 +577,65 @@ export default function AdminActivitiesClient({
                   key={act.id}
                   className="card"
                   style={{
-                    padding: '0.85rem',
-                    borderLeft: `4px solid ${sportBorderMap[act.sport_type] || 'var(--border-base)'}`,
+                    padding: '0.6rem 0.75rem',
+                    borderLeft: `3px solid ${sportBorderMap[act.sport_type] || 'var(--border-base)'}`,
                     background: isSelected ? 'var(--color-primary-light)' : 'var(--bg-elevated)',
+                    marginBottom: '0.35rem',
                   }}
                 >
-                  {/* Row 1: checkbox + runner name + status pill */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.4rem' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  {/* Top row: Checkbox + Runner + Status */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.35rem', marginBottom: '0.2rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', minWidth: 0 }}>
                       <input
                         type="checkbox"
                         checked={isSelected}
                         onChange={() => toggleSelectRow(act.id)}
-                        style={{ width: 16, height: 16, accentColor: 'var(--color-primary)', cursor: 'pointer' }}
+                        style={{ width: 14, height: 14, accentColor: 'var(--color-primary)', cursor: 'pointer', flexShrink: 0 }}
                       />
-                      <div>
-                        <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{act.runner_name}</div>
-                        <span className="badge badge-neutral" style={{ fontSize: '0.7rem' }}>
-                          {act.department_name}
-                        </span>
-                      </div>
+                      <span style={{ fontWeight: 700, fontSize: '0.825rem', color: 'var(--text-primary)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{act.runner_name}</span>
+                      <span className="badge badge-neutral" style={{ fontSize: '0.65rem', padding: '0.05rem 0.3rem', flexShrink: 0 }}>{act.department_name}</span>
                     </div>
                     {getStatusPill(act.status)}
                   </div>
 
-                  {/* Row 2: activity name + sport badge */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.3rem' }}>
+                  {/* Activity info & Metrics */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.775rem', color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>
+                      {act.activity_name}
+                    </span>
+                    <span>
+                      <strong style={{ color: 'var(--color-primary)' }}>{act.distance_converted.toFixed(1)} km</strong> · Pace: {act.pace_or_speed}
+                    </span>
+                  </div>
+
+                  {/* Action buttons */}
+                  <div style={{ display: 'flex', gap: '0.35rem' }}>
                     <a
                       href={`https://www.strava.com/activities/${act.strava_activity_id || act.id.replace('act-', '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--color-primary)', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', flex: 1, minWidth: 0 }}
-                      title="Xem chi tiết trên ứng dụng Strava"
+                      className="btn btn-secondary btn-sm"
+                      style={{ gap: '0.2rem', padding: '0.2rem 0.4rem', fontSize: '0.725rem', flex: 1, justifyContent: 'center' }}
                     >
-                      {act.activity_name} ↗
+                      Strava ↗
                     </a>
-                    {getSportBadge(act.sport_type)}
-                  </div>
-
-                  {/* Row 3: date */}
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)', marginBottom: '0.4rem' }}>
-                    {act.start_date}
-                  </div>
-
-                  {/* Row 4: metrics inline */}
-                  <div style={{ display: 'flex', gap: '0.75rem', fontSize: '0.8rem', marginBottom: '0.5rem', fontVariantNumeric: 'tabular-nums' }}>
-                    <div>
-                      <span style={{ color: 'var(--text-tertiary)' }}>Thực tế: </span>
-                      <span style={{ fontWeight: 500 }}>{act.distance_actual.toFixed(1)} km</span>
-                    </div>
-                    <div>
-                      <span style={{ color: 'var(--text-tertiary)' }}>Quy đổi: </span>
-                      <span style={{ fontWeight: 700, color: 'var(--color-primary)' }}>{act.distance_converted.toFixed(1)} km</span>
-                    </div>
-                    <div>
-                      <span style={{ color: 'var(--text-tertiary)' }}>Pace: </span>
-                      <span>{act.pace_or_speed}</span>
-                    </div>
-                  </div>
-
-                  {/* Row 5: approve / reject buttons 50/50 */}
-                  <div style={{ display: 'flex', gap: '0.4rem' }}>
-                    {act.status !== 'valid' ? (
+                    {act.status !== 'valid' && (
                       <button
                         onClick={() => approveSingle(act.id)}
                         className="btn btn-secondary btn-sm"
-                        style={{ color: 'var(--color-success)', gap: '0.25rem', flex: 1, justifyContent: 'center' }}
-                        title="Duyệt bài này"
+                        style={{ color: 'var(--color-success)', gap: '0.2rem', padding: '0.2rem 0.4rem', fontSize: '0.725rem', flex: 1, justifyContent: 'center' }}
                       >
-                        <Check size={14} /> Duyệt
+                        <Check size={12} /> Duyệt
                       </button>
-                    ) : (
-                      <div style={{ flex: 1 }} />
                     )}
-
-                    {act.status !== 'invalid' ? (
+                    {act.status !== 'invalid' && (
                       <button
                         onClick={() => openRejectModal(act.id)}
                         className="btn btn-sm"
-                        style={{
-                          background: 'var(--color-danger-bg)',
-                          color: 'var(--color-danger)',
-                          borderColor: 'var(--color-danger-border)',
-                          gap: '0.25rem',
-                          flex: 1,
-                          justifyContent: 'center',
-                        }}
-                        title="Từ chối bài này"
+                        style={{ background: 'var(--color-danger-bg)', color: 'var(--color-danger)', borderColor: 'var(--color-danger-border)', gap: '0.2rem', padding: '0.2rem 0.4rem', fontSize: '0.725rem', flex: 1, justifyContent: 'center' }}
                       >
-                        <Ban size={14} /> Từ chối
+                        <Ban size={12} /> Từ chối
                       </button>
-                    ) : (
-                      <div style={{ flex: 1 }} />
                     )}
                   </div>
 

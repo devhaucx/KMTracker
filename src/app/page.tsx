@@ -145,25 +145,33 @@ function LandingPage({ competition, stats }: { competition: Competition | null; 
     <div className="container" style={{ padding: '1.5rem 1.5rem 4rem', maxWidth: 920 }}>
 
       {/* Hero */}
-      <div style={{ textAlign: 'center', marginBottom: '2rem', paddingTop: '1rem' }}>
-        <img src="/icon.svg" alt="TM Tracker" width={80} height={80} className="hide-mobile" style={{ borderRadius: '18px', marginBottom: '1.25rem', boxShadow: '0 4px 24px rgba(252,76,2,0.25)' }} />
-        <img src="/icon.svg" alt="TM Tracker" width={56} height={56} className="show-mobile" style={{ borderRadius: '14px', marginBottom: '1rem', boxShadow: '0 4px 24px rgba(252,76,2,0.25)' }} />
+      <div style={{ textAlign: 'center', marginBottom: '2.5rem', paddingTop: '1rem' }}>
+        {/* Single logo rendering */}
+        <img
+          src="/icon.svg"
+          alt="TM Tracker"
+          width={72}
+          height={72}
+          style={{
+            borderRadius: '20px',
+            margin: '0 auto 1.25rem auto',
+            boxShadow: '0 8px 30px rgba(37,99,235,0.25)',
+          }}
+        />
 
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.35rem 0.85rem', background: 'var(--color-primary-light)', borderRadius: 'var(--radius-full)', marginBottom: '1rem' }}>
-          <Trophy size={14} style={{ color: 'var(--color-primary)' }} />
-          <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--color-primary)' }}>TM Tracker — Thi Đua Thể Thao Thái Minh</span>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.95rem', background: 'var(--color-primary-light)', borderRadius: 'var(--radius-full)', marginBottom: '1.25rem' }}>
+          <Trophy size={15} style={{ color: 'var(--color-primary)' }} />
+          <span style={{ fontSize: '0.825rem', fontWeight: 700, color: 'var(--color-primary)' }}>TM Tracker — Thi Đua Thể Thao Doanh Nghiệp</span>
         </div>
 
-        <h1 className="hide-mobile" style={{ fontSize: '2.25rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.15, marginBottom: '1rem' }}>
-          Bảng xếp hạng KM<br />
-          <span style={{ color: 'var(--color-primary)' }}>thi đua thể thao doanh nghiệp</span>
-        </h1>
-        <h1 className="show-mobile" style={{ fontSize: '1.625rem', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.25, marginBottom: '0.75rem' }}>
-          Bảng xếp hạng KM<br />
-          <span style={{ color: 'var(--color-primary)', display: 'inline-block', marginTop: '0.15rem' }}>thi đua thể thao</span>
+        <h1 style={{ fontSize: 'clamp(1.75rem, 4.5vw, 2.75rem)', fontWeight: 800, letterSpacing: '-0.02em', lineHeight: 1.3, marginBottom: '1rem' }}>
+          Bảng xếp hạng KM <br className="hide-mobile" />
+          <span style={{ color: 'var(--color-primary)', display: 'inline-block', marginTop: '0.2rem' }}>
+            thi đua thể thao doanh nghiệp
+          </span>
         </h1>
 
-        <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', maxWidth: 580, margin: '0 auto 1.5rem', lineHeight: 1.6 }}>
+        <p style={{ fontSize: '0.95rem', color: 'var(--text-secondary)', maxWidth: 580, margin: '0 auto 1.75rem', lineHeight: 1.6 }}>
           Kết nối Strava một lần. Mọi bài tập chạy bộ, đạp xe, đi bộ, bơi lội được tự động đồng bộ, kiểm duyệt pace và quy đổi điểm theo thể lệ.
         </p>
 
@@ -171,8 +179,8 @@ function LandingPage({ competition, stats }: { competition: Competition | null; 
         <InviteCodeInput />
 
         <div style={{ marginTop: '0.75rem' }}>
-          <Link href="/leaderboard" className="btn btn-ghost btn-sm" style={{ color: 'var(--text-secondary)', gap: '0.35rem' }}>
-            <Trophy size={14} /> Xem bảng xếp hạng
+          <Link href="/leaderboard" className="btn btn-secondary btn-sm" style={{ gap: '0.35rem', color: 'var(--text-primary)', border: '1px solid var(--border-base)' }}>
+            <Trophy size={14} style={{ color: 'var(--rank-gold)' }} /> Xem bảng xếp hạng trực tiếp
           </Link>
         </div>
       </div>
@@ -180,34 +188,36 @@ function LandingPage({ competition, stats }: { competition: Competition | null; 
       {/* Login section — high up, right after hero */}
       <div style={{ marginBottom: '2.5rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '1rem' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-tertiary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
-            <LogIn size={14} /> Đăng nhập
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+            <LogIn size={14} /> Đăng nhập hệ thống
           </div>
         </div>
-        <div className="mobile-grid-1col" style={{ '--grid-min': '260px', maxWidth: 560, margin: '0 auto' } as React.CSSProperties}>
+        <div className="mobile-grid-1col" style={{ '--grid-min': '260px', maxWidth: 580, margin: '0 auto', gap: '1rem' } as React.CSSProperties}>
           <a href="/api/auth/strava" className="card" style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
-            padding: '1.5rem', gap: '0.6rem', cursor: 'pointer', textDecoration: 'none',
-            borderColor: 'var(--color-primary-ring)', transition: 'border-color 0.15s, box-shadow 0.15s',
+            padding: '1.5rem', gap: '0.75rem', cursor: 'pointer', textDecoration: 'none',
+            border: '1.5px solid var(--color-primary-ring)', background: 'var(--bg-base)',
+            boxShadow: '0 4px 16px rgba(37,99,235,0.08)', transition: 'all 0.15s ease',
           }}>
-            <div style={{ width: 44, height: 44, borderRadius: '12px', background: 'var(--color-primary-light)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Zap size={22} />
+            <div style={{ width: 48, height: 48, borderRadius: '14px', background: 'var(--color-primary-light)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Zap size={24} />
             </div>
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }}>Vận động viên</h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>Vận động viên</h3>
+            <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               Đăng nhập bằng tài khoản Strava để tham gia thi đấu
             </p>
           </a>
           <Link href="/admin/login" className="card" style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center',
-            padding: '1.5rem', gap: '0.6rem', cursor: 'pointer', textDecoration: 'none',
-            borderColor: 'var(--color-warning)', transition: 'border-color 0.15s, box-shadow 0.15s',
+            padding: '1.5rem', gap: '0.75rem', cursor: 'pointer', textDecoration: 'none',
+            border: '1.5px solid var(--color-warning-border)', background: 'var(--bg-base)',
+            boxShadow: '0 4px 16px rgba(245,158,11,0.08)', transition: 'all 0.15s ease',
           }}>
-            <div style={{ width: 44, height: 44, borderRadius: '12px', background: 'var(--bg-muted)', color: 'var(--color-warning)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <ShieldCheck size={22} />
+            <div style={{ width: 48, height: 48, borderRadius: '14px', background: 'var(--color-warning-bg)', color: 'var(--color-warning)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ShieldCheck size={24} />
             </div>
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 700 }}>Ban Tổ Chức</h3>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+            <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>Ban Tổ Chức</h3>
+            <p style={{ fontSize: '0.825rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
               Đăng nhập bằng email để truy cập trang quản trị
             </p>
           </Link>

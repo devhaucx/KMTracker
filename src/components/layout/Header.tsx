@@ -39,25 +39,27 @@ export default function Header({ user }: HeaderProps) {
       <header style={{
         position: 'sticky', top: 0, zIndex: 100,
         background: 'var(--bg-base)',
+        backdropFilter: 'blur(12px)',
         borderBottom: '1px solid var(--border-base)',
+        boxShadow: '0 2px 10px rgba(15, 23, 42, 0.04)',
       }}>
         <div className="container" style={{
-          display: 'flex', alignItems: 'center',
-          height: '56px', gap: '1.5rem',
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          height: '60px', padding: '0 1.25rem',
         }}>
           {/* Logo */}
           <Link href="/" style={{
-            display: 'flex', alignItems: 'center', gap: '0.5rem',
-            fontWeight: 700, fontSize: '0.975rem', letterSpacing: '-0.01em',
+            display: 'flex', alignItems: 'center', gap: '0.6rem',
+            fontWeight: 700, fontSize: '1rem', letterSpacing: '-0.01em',
             color: 'var(--text-primary)', flexShrink: 0,
           }}>
-            <img src="/icon.svg" alt="TM Tracker" width={30} height={30} style={{ borderRadius: '7px', flexShrink: 0 }} />
-            TM Tracker
+            <img src="/icon.svg" alt="TM Tracker" width={32} height={32} style={{ borderRadius: '8px', flexShrink: 0, boxShadow: '0 2px 8px rgba(37,99,235,0.2)' }} />
+            <span>TM Tracker</span>
           </Link>
 
-          {/* Desktop Nav - Only shown when user is logged in / inside competition context */}
+          {/* Desktop Nav */}
           {isLoggedIn && !isAdminContext && (
-            <nav className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '0.15rem', flex: 1 }}>
+            <nav className="hide-mobile" style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', margin: '0 auto' }}>
               {navLinks.map(l => {
                 const active = pathname === l.href
                 return (
@@ -65,7 +67,8 @@ export default function Header({ user }: HeaderProps) {
                     style={{
                       color: active ? 'var(--color-primary)' : 'var(--text-secondary)',
                       fontWeight: active ? 700 : 500,
-                      display: 'flex', gap: '0.35rem',
+                      background: active ? 'var(--color-primary-light)' : 'transparent',
+                      display: 'flex', gap: '0.4rem', borderRadius: 'var(--radius-md)', padding: '0.4rem 0.85rem',
                     }}>
                     {l.icon} {l.label}
                   </Link>
@@ -75,11 +78,11 @@ export default function Header({ user }: HeaderProps) {
           )}
 
           {/* Right actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginLeft: 'auto' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginLeft: isLoggedIn ? undefined : 'auto' }}>
             <ThemeToggle />
 
             {!isAdminContext && (
-              <Link href="/admin/login" className="btn btn-ghost btn-sm" style={{ color: 'var(--color-warning)', gap: '0.35rem' }}>
+              <Link href="/admin/login" className="btn btn-secondary btn-sm" style={{ color: 'var(--color-warning)', gap: '0.35rem' }}>
                 <Shield size={14} /> <span className="hide-mobile">Admin</span>
               </Link>
             )}
@@ -87,26 +90,26 @@ export default function Header({ user }: HeaderProps) {
             {isLoggedIn ? (
               <Link href="/profile" style={{
                 display: 'flex', alignItems: 'center', gap: '0.5rem',
-                padding: '0.3rem 0.6rem 0.3rem 0.3rem',
-                borderRadius: '999px',
+                padding: '0.3rem 0.65rem 0.3rem 0.3rem',
+                borderRadius: 'var(--radius-full)',
                 border: '1px solid var(--border-base)',
                 background: 'var(--bg-subtle)',
-                fontSize: '0.85rem', fontWeight: 500,
+                fontSize: '0.85rem', fontWeight: 600,
                 color: 'var(--text-primary)',
               }}>
                 {user?.avatar_url ? (
-                  <img src={user.avatar_url} alt={displayName} style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover' }} />
+                  <img src={user.avatar_url} alt={displayName} style={{ width: 26, height: 26, borderRadius: '50%', objectFit: 'cover' }} />
                 ) : (
-                  <span style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700 }}>
+                  <span style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--color-primary)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700 }}>
                     {userInitial}
                   </span>
                 )}
-                <span className="hide-mobile" style={{ maxWidth: 90, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <span className="hide-mobile" style={{ maxWidth: 100, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {displayName}
                 </span>
               </Link>
             ) : (
-              <a href="/api/auth/strava" className="btn btn-primary btn-sm" style={{ gap: '0.35rem' }}>
+              <a href="/api/auth/strava" className="btn btn-primary btn-sm" style={{ gap: '0.35rem', boxShadow: '0 2px 8px rgba(37,99,235,0.25)' }}>
                 <Zap size={14} /> <span className="hide-mobile">Tham gia</span>
               </a>
             )}
@@ -114,14 +117,16 @@ export default function Header({ user }: HeaderProps) {
         </div>
       </header>
 
-      {/* Persistent Mobile Bottom Bar - Only shown inside authenticated competition context */}
+      {/* Persistent Mobile Bottom Bar */}
       {isLoggedIn && !isAdminContext && (
         <nav className="mobile-bottom-nav">
           {mobileTabs.map(tab => {
             const active = pathname === tab.href
             return (
               <Link key={tab.href} href={tab.href} className={`mobile-nav-item${active ? ' active' : ''}`}>
-                {tab.icon}
+                <div className="mobile-nav-item-icon">
+                  {tab.icon}
+                </div>
                 <span>{tab.label}</span>
               </Link>
             )

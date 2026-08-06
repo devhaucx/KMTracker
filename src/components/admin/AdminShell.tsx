@@ -26,7 +26,6 @@ const NAV_ITEMS = [
   { href: '/admin/reports', label: 'Báo cáo', icon: FileText, exact: false },
 ]
 
-// 4 primary direct items on mobile bottom nav + 1 "More" sheet trigger
 const MOBILE_PRIMARY = NAV_ITEMS.slice(0, 4)
 const MOBILE_SECONDARY = NAV_ITEMS.slice(4)
 
@@ -106,34 +105,36 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
       {/* Main content area */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-        {/* Mobile top bar */}
+        {/* Native Android Top App Bar */}
         <div className="show-mobile" style={{
-          height: 48, padding: '0 1rem',
-          background: 'var(--bg-base)', borderBottom: '1px solid var(--border-base)',
+          height: 44, padding: '0 0.85rem',
+          background: 'var(--bg-base)', borderBottom: '1px solid var(--border-subtle)',
           alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 56, zIndex: 10,
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
             <Shield size={16} style={{ color: 'var(--color-primary)' }} />
-            <span style={{ fontWeight: 700, fontSize: '0.925rem', color: 'var(--text-primary)' }}>
+            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
               {getPageTitle(pathname)}
             </span>
           </div>
-          <Link href="/leaderboard" style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-            <ExternalLink size={12} /> Leaderboard
+          <Link href="/leaderboard" style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-primary)', display: 'flex', alignItems: 'center', gap: '0.2rem' }}>
+            <ExternalLink size={12} /> Bảng điểm
           </Link>
         </div>
 
         <div className="admin-content" style={{ flex: 1, overflowY: 'auto' }}>{children}</div>
       </div>
 
-      {/* Mobile bottom navigation bar */}
+      {/* Material 3 Android Bottom Navigation Bar */}
       <nav className="admin-bottom-nav">
         {MOBILE_PRIMARY.map((item) => {
           const active = isActive(item)
           const Icon = item.icon
           return (
             <Link key={item.href} href={item.href} className={`admin-nav-item${active ? ' active' : ''}`}>
-              <Icon size={19} />
+              <div className="admin-nav-item-icon">
+                <Icon size={18} />
+              </div>
               <span>{item.label}</span>
             </Link>
           )
@@ -142,7 +143,9 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
           className={`admin-nav-item${moreSheetOpen || isMoreActive ? ' active' : ''}`}
           onClick={() => setMoreSheetOpen(!moreSheetOpen)}
         >
-          {moreSheetOpen ? <X size={19} /> : <MoreHorizontal size={19} />}
+          <div className="admin-nav-item-icon">
+            {moreSheetOpen ? <X size={18} /> : <MoreHorizontal size={18} />}
+          </div>
           <span>Khác</span>
         </button>
       </nav>
@@ -152,7 +155,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
         <>
           <div className="admin-bottom-sheet-backdrop open" onClick={() => setMoreSheetOpen(false)} />
           <div className="admin-bottom-sheet open">
-            <div style={{ padding: '0.75rem 0.5rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <div style={{ padding: '0.5rem 0.25rem', display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
               {MOBILE_SECONDARY.map((item) => {
                 const active = isActive(item)
                 const Icon = item.icon
@@ -160,8 +163,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
                   <Link
                     key={item.href} href={item.href} onClick={() => setMoreSheetOpen(false)}
                     style={{
-                      display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem',
-                      borderRadius: 'var(--radius-md)', fontSize: '0.9rem', fontWeight: active ? 600 : 500,
+                      display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.65rem 0.85rem',
+                      borderRadius: 'var(--radius-md)', fontSize: '0.875rem', fontWeight: active ? 600 : 500,
                       color: active ? 'var(--color-primary)' : 'var(--text-secondary)',
                       background: active ? 'var(--color-primary-light)' : 'transparent',
                     }}
@@ -175,8 +178,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               <Link
                 href="/leaderboard" onClick={() => setMoreSheetOpen(false)}
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem',
-                  borderRadius: 'var(--radius-md)', fontSize: '0.9rem', fontWeight: 500,
+                  display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.65rem 0.85rem',
+                  borderRadius: 'var(--radius-md)', fontSize: '0.875rem', fontWeight: 500,
                   color: 'var(--text-secondary)',
                 }}
               >
@@ -186,8 +189,8 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               <a
                 href="/api/auth/logout"
                 style={{
-                  display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.75rem 1rem',
-                  borderRadius: 'var(--radius-md)', fontSize: '0.9rem', fontWeight: 500,
+                  display: 'flex', alignItems: 'center', gap: '0.65rem', padding: '0.65rem 0.85rem',
+                  borderRadius: 'var(--radius-md)', fontSize: '0.875rem', fontWeight: 500,
                   color: 'var(--color-danger)',
                 }}
               >

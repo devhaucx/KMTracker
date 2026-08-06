@@ -73,7 +73,7 @@ export default function LeaderboardClient({ individual, department, totalKm, cur
   const handleTabChange = (t: 'individual' | 'department') => { setTab(t); setPage(1) }
 
   return (
-    <div className="container" style={{ padding: '1.5rem 1.5rem 4rem' }}>
+    <div className="container" style={{ padding: '0.75rem 0.75rem 4rem' }}>
 
       <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.75rem', marginBottom: '1.25rem' }}>
         <div>
