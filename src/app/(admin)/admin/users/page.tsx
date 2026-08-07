@@ -1,11 +1,15 @@
-import { getAllUsers } from '@/lib/queries/admin'
-import { getDepartments } from '@/lib/queries/competition'
+import { getParticipantsWithStats } from '@/lib/queries/admin'
+import { getDepartments, getActiveCompetition } from '@/lib/queries/competition'
 import AdminUsersClient, { type AdminUserItem, type AdminDepartment } from '@/components/admin/AdminUsersClient'
 import { requireAdmin } from '@/lib/auth/session'
 
 export default async function AdminUsersPage() {
   await requireAdmin()
-  const [dbUsers, dbDepartments] = await Promise.all([getAllUsers(), getDepartments()])
+  const competition = await getActiveCompetition()
+  const [dbUsers, dbDepartments] = await Promise.all([
+    getParticipantsWithStats(competition?.id),
+    getDepartments(),
+  ])
 
   const departments: AdminDepartment[] = dbDepartments.map((d) => ({
     id: d.id,
@@ -20,14 +24,14 @@ export default async function AdminUsersPage() {
     email: u.email,
     avatar_url: u.avatar_url,
     department_id: u.department_id,
-    department_name: u.departments?.name ?? null,
-    department_color: u.departments?.avatar_color ?? null,
+    department_name: u.department_name ?? null,
+    department_color: u.department_color ?? null,
     role: u.role,
     strava_athlete_id: u.strava_athlete_id,
     created_at: u.created_at,
-    total_km: 0,
-    activity_count: 0,
-    status: 'active' as const,
+    total_km: u.total_km,
+    activity_count: u.activity_count,
+    status: u.status,
   }))
 
   return <AdminUsersClient users={users} departments={departments} />
