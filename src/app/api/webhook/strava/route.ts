@@ -32,8 +32,9 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   // Strava requires webhook POST response within 2 seconds
   // We use Cloudflare waitUntil for async processing to meet this requirement
+  let payload: any
   try {
-    const payload = await request.json()
+    payload = await request.json()
     console.log('Received Strava Webhook Event:', payload)
 
     const { object_type, aspect_type, object_id, owner_id, updates } = payload
@@ -57,16 +58,17 @@ export async function POST(request: NextRequest) {
   } catch (err: any) {
     console.error('Webhook processing error:', err)
 
-    // Store failed event for retry
+    // Store failed event for retry (payload already parsed above)
     try {
-      const payload = await request.json()
-      await storeFailedWebhookEvent(
-        payload.object_id,
-        payload.owner_id,
-        payload.aspect_type,
-        payload.updates,
-        err.message
-      )
+      if (payload) {
+        await storeFailedWebhookEvent(
+          payload.object_id,
+          payload.owner_id,
+          payload.aspect_type,
+          payload.updates,
+          err.message
+        )
+      }
     } catch (storeError) {
       console.error('Failed to store webhook event:', storeError)
     }
@@ -208,11 +210,6 @@ export async function processWebhookEvent(
     )
 
     // Skip if sport is not supported in this competition
-    if (score.categorySport === 'Other') {
-      console.log(`Activity ${activityId} sport type not supported in competition ${competition.id}`)
-      continue
-    }
-
     const sportKey = score.categorySport
     const matchedSport = (sports || []).find(
       s => s.sport_type === sportKey
@@ -223,7 +220,7 @@ export async function processWebhookEvent(
       competition_id: competition.id,
       competition_sport_id: matchedSport?.id || null,
       strava_activity_id: activityId,
-      sport_type: score.categorySport,
+      sport_type: score.categorySport === 'Other' ? (act.sport_type || act.type) : score.categorySport,
       activity_name: act.name || 'Hoạt động Strava',
       distance_actual_km: score.distanceActualKm,
       distance_converted_km: score.distanceConvertedKm,
@@ -248,7 +245,7 @@ function buildCustomRules(sports: any[]): CompetitionRulesConfig {
   const rules: CompetitionRulesConfig = {}
 
   for (const s of sports) {
-    const unit = s.validation_unit === 'km/h' ? 'km/h' : s.validation_unit === 'min/100m' ? 'min/100m' : 'min/km'
+    const unit = s.validation_unit === 'km/h' ? 'km/h' : s.validation_unit === 'sec/100m' ? 'sec/100m' : 'sec/km'
     rules[s.sport_type as SportType] = {
       enabled: s.is_active,
       ratio: s.conversion_ratio,

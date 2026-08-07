@@ -8,6 +8,7 @@ export type Json =
 
 export type UserRole = 'user' | 'admin' | 'super_admin'
 export type SportType = 'Run' | 'Walk' | 'Ride' | 'Swim'
+export type LeaderboardSportType = SportType | 'ALL'
 export type CompetitionStatus = 'draft' | 'registration' | 'active' | 'ended'
 
 export interface Department {
@@ -98,7 +99,7 @@ export interface IndividualLeaderboardEntry {
   department_code: string | null
   department_color: string | null
   competition_id: string
-  sport_type: SportType
+  sport_type: LeaderboardSportType
   total_converted_km: number
   total_actual_km: number
   activity_count: number

@@ -1,11 +1,19 @@
 import { SportType } from '../supabase/types'
 
+function formatPaceValue(sec: number, unit: string): string {
+  if (unit === 'km/h') return sec.toFixed(1) + ' km/h'
+  const m = Math.floor(sec / 60)
+  const s = Math.round(sec % 60)
+  const label = unit === 'sec/100m' ? 'phút/100m' : 'phút/km'
+  return `${m}:${String(s).padStart(2, '0')} ${label}`
+}
+
 export interface DynamicSportRule {
   enabled: boolean
   ratio: number
   minPaceOrSpeed: number // min value
   maxPaceOrSpeed: number // max value
-  unit: 'min/km' | 'km/h' | 'min/100m'
+  unit: 'sec/km' | 'km/h' | 'sec/100m'
 }
 
 export type CompetitionRulesConfig = Partial<Record<SportType, DynamicSportRule>>
@@ -103,9 +111,9 @@ export function calculateActivityScore(
   const rule: DynamicSportRule = (category !== 'Other' && customRules?.[category]) || {
     enabled: true,
     ratio: category === 'Ride' ? 0.3333 : category === 'Swim' ? 5.0 : 1.0,
-    minPaceOrSpeed: category === 'Run' ? 4.0 : category === 'Walk' ? 9.0 : category === 'Ride' ? 10.0 : 2.0,
-    maxPaceOrSpeed: category === 'Run' ? 9.0 : category === 'Walk' ? 14.0 : category === 'Ride' ? 25.0 : 6.0,
-    unit: category === 'Ride' ? 'km/h' : category === 'Swim' ? 'min/100m' : 'min/km'
+    minPaceOrSpeed: category === 'Run' ? 240 : category === 'Walk' ? 540 : category === 'Ride' ? 10.0 : 90,
+    maxPaceOrSpeed: category === 'Run' ? 900 : category === 'Walk' ? 1200 : category === 'Ride' ? 35.0 : 360,
+    unit: category === 'Ride' ? 'km/h' : category === 'Swim' ? 'sec/100m' : 'sec/km'
   }
 
   if (category === 'Other' || !rule.enabled) {
@@ -121,22 +129,25 @@ export function calculateActivityScore(
     }
   }
 
-  // Calculate pace / speed based on category
+  // Calculate pace (sec/km, sec/100m) or speed (km/h) based on category
   let paceOrSpeed = 0
   let isValid = false
 
   if (category === 'Run' || category === 'Walk') {
-    const paceMinPerKm = (movingTimeSeconds / 60.0) / distanceKm
-    paceOrSpeed = Math.round(paceMinPerKm * 100) / 100
-    isValid = paceMinPerKm >= rule.minPaceOrSpeed && paceMinPerKm <= rule.maxPaceOrSpeed
+    // Pace in seconds per km
+    const paceSecPerKm = movingTimeSeconds / distanceKm
+    paceOrSpeed = Math.round(paceSecPerKm * 100) / 100
+    isValid = paceSecPerKm >= rule.minPaceOrSpeed && paceSecPerKm <= rule.maxPaceOrSpeed
   } else if (category === 'Ride') {
+    // Speed in km/h
     const speedKmh = distanceKm / (movingTimeSeconds / 3600.0)
     paceOrSpeed = Math.round(speedKmh * 100) / 100
     isValid = speedKmh >= rule.minPaceOrSpeed && speedKmh <= rule.maxPaceOrSpeed
   } else if (category === 'Swim') {
-    const paceMinPer100m = (movingTimeSeconds / 60.0) / (distanceKm * 10)
-    paceOrSpeed = Math.round(paceMinPer100m * 100) / 100
-    isValid = paceMinPer100m >= rule.minPaceOrSpeed && paceMinPer100m <= rule.maxPaceOrSpeed
+    // Pace in seconds per 100m
+    const paceSecPer100m = movingTimeSeconds / (distanceKm * 10)
+    paceOrSpeed = Math.round(paceSecPer100m * 100) / 100
+    isValid = paceSecPer100m >= rule.minPaceOrSpeed && paceSecPer100m <= rule.maxPaceOrSpeed
   }
 
   const convertedKm = isValid ? Math.round(distanceKm * rule.ratio * 100) / 100 : 0
@@ -151,6 +162,6 @@ export function calculateActivityScore(
     validationUnit: rule.unit,
     rejectionReason: isValid
       ? null
-      : `Chỉ số ${rule.unit} (${paceOrSpeed}) nằm ngoài phạm vi quy định (${rule.minPaceOrSpeed} - ${rule.maxPaceOrSpeed} ${rule.unit})`
+      : `Tốc độ ${formatPaceValue(paceOrSpeed, rule.unit)} nằm ngoài phạm vi quy định (${formatPaceValue(rule.minPaceOrSpeed, rule.unit)} - ${formatPaceValue(rule.maxPaceOrSpeed, rule.unit)})`
   }
 }

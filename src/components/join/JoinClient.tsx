@@ -8,6 +8,15 @@ import type { Competition, CompetitionSport, Department } from '@/lib/supabase/t
 const SPORT_BADGE: Record<string, string> = { Run: 'badge-run', Walk: 'badge-walk', Ride: 'badge-ride', Swim: 'badge-swim' }
 const SPORT_ICON: Record<string, string> = { Run: '🏃', Walk: '🚶', Ride: '🚴', Swim: '🏊' }
 
+function formatPaceRange(min: number, max: number, unit: string): string {
+  if (unit === 'km/h') {
+    return `${min}–${max} km/h`
+  }
+  const fmt = (sec: number) => `${Math.floor(sec / 60)}:${String(Math.round(sec % 60)).padStart(2, '0')}`
+  const label = unit === 'sec/100m' ? 'phút/100m' : 'phút/km'
+  return `${fmt(min)}–${fmt(max)} ${label}`
+}
+
 interface Props {
   code: string
   competition: Competition | null
@@ -120,7 +129,7 @@ export default function JoinClient({ code, competition, sports, departments }: P
                       {SPORT_ICON[s.sport_type] || ''} {s.display_name}
                     </span>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                      {s.min_pace_or_speed}–{s.max_pace_or_speed} {s.validation_unit}
+                      {formatPaceRange(s.min_pace_or_speed, s.max_pace_or_speed, s.validation_unit)}
                     </span>
                   </div>
                   <span style={{ fontSize: '0.75rem', color: 'var(--text-tertiary)' }}>

@@ -7,10 +7,10 @@ export async function getAdminStats(competitionId?: string) {
   const compFilter = competitionId ? { competition_id: competitionId } : {}
 
   const [participants, activities, suspicious, totalKm] = await Promise.all([
-    supabase.from('competition_participants').select('*', { count: 'exact', head: true }).eq('status', 'active'),
+    supabase.from('competition_participants').select('*', { count: 'exact', head: true }).eq('status', 'active').match(compFilter),
     supabase.from('activities').select('*', { count: 'exact', head: true }).match(compFilter),
     supabase.from('activities').select('*', { count: 'exact', head: true }).eq('is_valid', false).match(compFilter),
-    supabase.from('mv_individual_leaderboard').select('total_converted_km').match(compFilter),
+    supabase.from('mv_individual_leaderboard').select('total_converted_km').match({ ...compFilter, sport_type: 'ALL' }),
   ])
 
   const totalConverted = (totalKm.data || []).reduce((sum: number, r: any) => sum + (r.total_converted_km || 0), 0)
@@ -68,6 +68,7 @@ export async function getTopAthletes(competitionId: string, limit = 10) {
     .from('mv_individual_leaderboard')
     .select('*')
     .eq('competition_id', competitionId)
+    .eq('sport_type', 'ALL')
     .order('overall_rank')
     .limit(limit)
   return data || []

@@ -9,7 +9,9 @@ export async function getActiveCompetition() {
     .select('*')
     .eq('status', 'active')
     .eq('is_deleted', false)
-    .single()
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
   return (data || null) as Competition | null
 }
 

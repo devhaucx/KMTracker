@@ -9,7 +9,7 @@ export default async function DashboardPage() {
   const activeComp = await getActiveCompetition()
   const [competitions, activities] = await Promise.all([
     getMyCompetitions(),
-    getMyActivities(activeComp?.id),
+    getMyActivities(),
   ])
 
   const allComps = activeComp && !competitions.find(c => c.id === activeComp.id)

@@ -56,7 +56,7 @@ export async function createCompetition(data: {
         conversion_ratio: rule.ratio,
         min_pace_or_speed: parseFloat(rule.minPaceOrSpeed) || 0,
         max_pace_or_speed: parseFloat(rule.maxPaceOrSpeed) || 0,
-        validation_unit: isRide ? 'km/h' : isSwim ? 'min/100m' : 'min/km',
+        validation_unit: isRide ? 'km/h' : isSwim ? 'sec/100m' : 'sec/km',
         is_active: true,
       }
     })
@@ -158,7 +158,7 @@ export async function updateCompetitionSports(
         conversion_ratio: rule.ratio,
         min_pace_or_speed: parseFloat(rule.minPaceOrSpeed) || 0,
         max_pace_or_speed: parseFloat(rule.maxPaceOrSpeed) || 0,
-        validation_unit: isRide ? 'km/h' : isSwim ? 'min/100m' : 'min/km',
+        validation_unit: isRide ? 'km/h' : isSwim ? 'sec/100m' : 'sec/km',
         is_active: true,
       }
     })

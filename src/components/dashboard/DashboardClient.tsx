@@ -22,6 +22,15 @@ const SPORT_META: Record<string, { icon: string; badge: string; color: string; b
   Swim: { icon: '🏊', badge: 'badge badge-swim', color: 'var(--sport-swim)', border: 'var(--sport-swim)' },
 }
 
+function formatPaceOrSpeed(sportType: string, paceOrSpeed: number): string {
+  if (!paceOrSpeed) return '—'
+  if (sportType === 'Ride') return `${paceOrSpeed.toFixed(1)} km/h`
+  const m = Math.floor(paceOrSpeed / 60)
+  const s = Math.round(paceOrSpeed % 60)
+  const label = sportType === 'Swim' ? 'phút/100m' : 'phút/km'
+  return `${m}:${String(s).padStart(2, '0')} ${label}`
+}
+
 export default function DashboardClient({ user, competitions, activeCompetition, activities }: Props) {
   const router = useRouter()
   const [selectedCompId, setSelectedCompId] = useState(activeCompetition?.id || competitions[0]?.id || '')
@@ -46,12 +55,22 @@ export default function DashboardClient({ user, competitions, activeCompetition,
 
   const sportTotal = sportBreakdown.reduce((s, x) => s + x.km, 0)
 
-  const handleResync = () => {
+  const handleResync = async () => {
     setResyncing(true)
-    setTimeout(() => {
-      setResyncing(false)
-      window.location.reload()
-    }, 800)
+    setResyncMsg('')
+    try {
+      const { resyncMyActivities } = await import('@/app/(auth)/dashboard/actions')
+      const result = await resyncMyActivities(selectedComp?.id)
+      if (result.success) {
+        setResyncMsg(`Đã đồng bộ ${result.processed} bài tập.`)
+        router.refresh()
+      } else {
+        setResyncMsg(result.error || 'Đồng bộ thất bại.')
+      }
+    } catch {
+      setResyncMsg('Có lỗi xảy ra khi đồng bộ.')
+    }
+    setResyncing(false)
   }
 
   const handleJoinByCode = (e: React.FormEvent) => {
@@ -280,7 +299,7 @@ export default function DashboardClient({ user, competitions, activeCompetition,
                         <td style={{ textAlign: 'right', fontWeight: 700, color: a.is_valid ? 'var(--color-primary)' : 'var(--text-tertiary)' }}>
                           {a.distance_converted_km.toFixed(1)} km
                         </td>
-                        <td style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{a.pace_or_speed}</td>
+                        <td style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{formatPaceOrSpeed(a.sport_type, a.pace_or_speed)}</td>
                         <td style={{ textAlign: 'center' }}>
                           {a.is_valid
                             ? <span className="badge status-ok" style={{ gap: '0.25rem' }}><CheckCircle2 size={13} /> Hợp lệ</span>
@@ -321,7 +340,7 @@ export default function DashboardClient({ user, competitions, activeCompetition,
                     </div>
                     <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'baseline' }}>
                       <div style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)', fontWeight: 600 }}>Pace</div>
-                      <div style={{ fontWeight: 600, color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{a.pace_or_speed}</div>
+                      <div style={{ fontWeight: 600, color: 'var(--text-secondary)', fontVariantNumeric: 'tabular-nums' }}>{formatPaceOrSpeed(a.sport_type, a.pace_or_speed)}</div>
                     </div>
                   </div>
                   {a.is_valid

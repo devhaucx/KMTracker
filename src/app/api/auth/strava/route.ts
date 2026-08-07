@@ -12,9 +12,12 @@ export async function GET(request: NextRequest) {
   }
 
   const inviteCode = request.nextUrl.searchParams.get('invite') || ''
+  const deptId = request.nextUrl.searchParams.get('dept') || ''
   const baseUrl = getAppUrl(request)
+
+  const state = [inviteCode, deptId].filter(Boolean).join('|')
 
   const { getStravaAuthUrl } = await import('@/lib/strava/oauth')
   const redirectUri = `${baseUrl}/api/auth/strava/callback`
-  return NextResponse.redirect(getStravaAuthUrl(redirectUri, inviteCode))
+  return NextResponse.redirect(getStravaAuthUrl(redirectUri, state))
 }

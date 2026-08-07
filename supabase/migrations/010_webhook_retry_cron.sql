@@ -5,9 +5,9 @@ SELECT cron.schedule(
   $$
   SELECT
     net.http_post(
-      url := format('%s/api/cron/retry-webhooks', current_setting('app.base_url')),
+      url := 'https://kmtracker.dev-haucx.workers.dev/api/cron/retry-webhooks',
       headers := jsonb_build_object('Content-Type', 'application/json')::jsonb,
-      body := jsonb_build_object('cron_key', current_setting('app.cron_secret'))::jsonb
+      body := jsonb_build_object('cron_key', 'FbcY6dE#WBh#Afj')::jsonb
     );
   $$
 );

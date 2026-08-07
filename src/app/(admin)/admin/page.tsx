@@ -49,12 +49,12 @@ export default async function AdminPage() {
       const totalSec = a.pace_or_speed ?? 0
       const min = Math.floor(totalSec / 60)
       const sec = Math.round(totalSec % 60)
-      paceDisplay = `${min}:${sec.toString().padStart(2, '0')} min/100m`
+      paceDisplay = `${min}:${sec.toString().padStart(2, '0')} phút/100m`
     } else {
       const totalSec = a.pace_or_speed ?? 0
       const min = Math.floor(totalSec / 60)
       const sec = Math.round(totalSec % 60)
-      paceDisplay = `${min}:${sec.toString().padStart(2, '0')} min/km`
+      paceDisplay = `${min}:${sec.toString().padStart(2, '0')} phút/km`
     }
 
     const sportIcons: Record<string, string> = { Run: '🏃 Chạy bộ', Walk: '🚶 Đi bộ', Ride: '🚴 Đạp xe', Swim: '🏊 Bơi' }

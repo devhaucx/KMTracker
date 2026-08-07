@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getCurrentUserIdFromRequest } from '@/lib/auth/session'
 
 export async function POST(request: NextRequest) {
+  const session = await getCurrentUserIdFromRequest(request)
+  if (!session || (session.role !== 'admin' && session.role !== 'super_admin')) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const clientId = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID
   const clientSecret = process.env.STRAVA_CLIENT_SECRET
   const verifyToken = process.env.STRAVA_WEBHOOK_VERIFY_TOKEN
@@ -52,7 +58,12 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ success: true, subscription: body, callback_url: callbackUrl })
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const session = await getCurrentUserIdFromRequest(request)
+  if (!session || (session.role !== 'admin' && session.role !== 'super_admin')) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
   const clientId = process.env.NEXT_PUBLIC_STRAVA_CLIENT_ID
   const clientSecret = process.env.STRAVA_CLIENT_SECRET
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 import { RefreshCw, TrendingUp, Search, Flame, Target, Trophy, ChevronLeft, ChevronRight, Zap } from 'lucide-react'
 import Podium from '@/components/leaderboard/Podium'
 import SportFilter from '@/components/leaderboard/SportFilter'
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export default function LeaderboardClient({ individual, department, totalKm, currentUserId, competitionName }: Props) {
+  const router = useRouter()
   const [tab, setTab]         = useState<'individual' | 'department'>('individual')
   const [sport, setSport]     = useState('ALL')
   const [search, setSearch]   = useState('')
@@ -26,13 +28,19 @@ export default function LeaderboardClient({ individual, department, totalKm, cur
   const [spinning, setSpinning] = useState(false)
 
   const filteredIndividual = useMemo(() => {
-    return individual.filter(item => {
-      const matchSport = sport === 'ALL' || item.sport_type === sport
-      const matchSearch = search.trim() === '' ||
-        item.full_name.toLowerCase().includes(search.toLowerCase()) ||
-        (item.department_name && item.department_name.toLowerCase().includes(search.toLowerCase()))
-      return matchSport && matchSearch
-    })
+    const targetSport = sport === 'ALL' ? 'ALL' : sport
+    return individual
+      .filter(item => item.sport_type === targetSport)
+      .filter(item => {
+        const matchSearch = search.trim() === '' ||
+          item.full_name.toLowerCase().includes(search.toLowerCase()) ||
+          (item.department_name && item.department_name.toLowerCase().includes(search.toLowerCase()))
+        return matchSearch
+      })
+      .sort((a, b) => {
+        if (sport === 'ALL') return a.overall_rank - b.overall_rank
+        return a.rank_by_sport - b.rank_by_sport
+      })
   }, [individual, sport, search])
 
   const filteredDepartment = useMemo(() => {
@@ -58,17 +66,21 @@ export default function LeaderboardClient({ individual, department, totalKm, cur
 
   const myEntry = useMemo(() => {
     if (!currentUserId) return null
-    // Aggregate across all sports for the user's overall rank
-    const myEntries = individual.filter(i => i.user_id === currentUserId)
-    if (myEntries.length === 0) return null
-    return myEntries.reduce((best, e) => e.overall_rank < best.overall_rank ? e : best)
+    return individual.find(i => i.user_id === currentUserId && i.sport_type === 'ALL') || null
   }, [individual, currentUserId])
 
   const totalParticipants = useMemo(() => {
-    return new Set(individual.map(i => i.user_id)).size
+    return new Set(individual.filter(i => i.sport_type === 'ALL').map(i => i.user_id)).size
   }, [individual])
 
-  const refresh = () => { setSpinning(true); setTimeout(() => { setSpinning(false); window.location.reload() }, 600) }
+  const refresh = async () => {
+    setSpinning(true)
+    try {
+      await router.refresh()
+    } finally {
+      setSpinning(false)
+    }
+  }
 
   const handleSportChange = (s: string) => { setSport(s); setPage(1) }
   const handleTabChange = (t: 'individual' | 'department') => { setTab(t); setPage(1) }
@@ -87,7 +99,7 @@ export default function LeaderboardClient({ individual, department, totalKm, cur
           </div>
           <h1 style={{ fontSize: 'clamp(1.1rem, 4vw, 1.375rem)', fontWeight: 700, lineHeight: 1.2 }}>{competitionName || 'Bảng Xếp Hạng'}</h1>
           <p className="hide-mobile" style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginTop: '0.15rem' }}>
-            Cập nhật tự động 60s/lần · Đấu cá nhân &amp; Thi đua phòng ban
+            Đấu cá nhân &amp; Thi đua phòng ban
           </p>
         </div>
         <button onClick={refresh} className="btn btn-secondary btn-sm" style={{ flexShrink: 0, minWidth: 'auto' }}>
@@ -148,8 +160,8 @@ export default function LeaderboardClient({ individual, department, totalKm, cur
         </div>
       )}
 
-      {tab === 'individual' && sport === 'ALL' && !search && individual.length >= 3 && (
-        <Podium topThree={individual.slice(0, 3)} />
+      {tab === 'individual' && sport === 'ALL' && !search && (
+        <Podium topThree={filteredIndividual.slice(0, 3)} />
       )}
 
       <div className="mobile-stack" style={{ gap: '0.75rem', marginBottom: '1.25rem' }}>

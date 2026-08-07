@@ -10,7 +10,7 @@ function formatPaceOrSpeed(sportType: SportType, paceOrSpeed: number): string {
     case 'Walk': {
       const mins = Math.floor(paceOrSpeed / 60)
       const secs = Math.round(paceOrSpeed % 60)
-      return `${mins}:${String(secs).padStart(2, '0')} min/km`
+      return `${mins}:${String(secs).padStart(2, '0')} phút/km`
     }
     case 'Ride': {
       return `${paceOrSpeed.toFixed(1)} km/h`
@@ -18,7 +18,7 @@ function formatPaceOrSpeed(sportType: SportType, paceOrSpeed: number): string {
     case 'Swim': {
       const mins = Math.floor(paceOrSpeed / 60)
       const secs = Math.round(paceOrSpeed % 60)
-      return `${mins}:${String(secs).padStart(2, '0')} min/100m`
+      return `${mins}:${String(secs).padStart(2, '0')} phút/100m`
     }
     default:
       return String(paceOrSpeed)

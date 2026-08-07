@@ -95,7 +95,8 @@ export default function AdminActivitiesClient({
 
   const bulkApprove = async () => {
     const now = new Date().toISOString().replace('T', ' ').slice(0, 16)
-    await bulkApproveAction(selectedIds)
+    const result = await bulkApproveAction(selectedIds)
+    if (!result?.success) return
     setActivities((prev) =>
       prev.map((act) =>
         selectedIds.includes(act.id)
@@ -113,7 +114,8 @@ export default function AdminActivitiesClient({
 
   const bulkReject = async () => {
     const now = new Date().toISOString().replace('T', ' ').slice(0, 16)
-    await bulkRejectAction(selectedIds, 'Từ chối bởi Quản trị viên (Hàng loạt)')
+    const result = await bulkRejectAction(selectedIds, 'Từ chối bởi Quản trị viên (Hàng loạt)')
+    if (!result?.success) return
     setActivities((prev) =>
       prev.map((act) =>
         selectedIds.includes(act.id)
@@ -134,7 +136,8 @@ export default function AdminActivitiesClient({
     if (!target) return
 
     const now = new Date().toISOString().replace('T', ' ').slice(0, 16)
-    await approveActivityAction(id)
+    const result = await approveActivityAction(id)
+    if (!result?.success) return
     setActivities((prev) =>
       prev.map((act) =>
         act.id === id ? { ...act, status: 'valid' as const, rejection_reason: null } : act
@@ -164,7 +167,8 @@ export default function AdminActivitiesClient({
     const reasonText = rejectReason || 'Không đáp ứng thể lệ cuộc thi'
     const now = new Date().toISOString().replace('T', ' ').slice(0, 16)
 
-    await rejectActivityAction(rejectingId, reasonText)
+    const result = await rejectActivityAction(rejectingId, reasonText)
+    if (!result?.success) return
     setActivities((prev) =>
       prev.map((act) =>
         act.id === rejectingId

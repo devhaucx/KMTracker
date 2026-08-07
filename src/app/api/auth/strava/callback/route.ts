@@ -62,7 +62,13 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const inviteCode = searchParams.get('state') || ''
+    const state = searchParams.get('state') || ''
+    const [inviteCode, deptId] = state.split('|')
+
+    if (deptId) {
+      await supabaseAdmin.from('users').update({ department_id: deptId }).eq('id', userId)
+    }
+
     if (inviteCode) {
       const { data: comp } = await supabaseAdmin
         .from('competitions').select('id')
@@ -72,14 +78,27 @@ export async function GET(request: NextRequest) {
           { user_id: userId, competition_id: comp.id, status: 'active' },
           { onConflict: 'user_id, competition_id' }
         )
+      }
+    }
 
+    // Backfill activities for ALL active competitions the user participates in
+    try {
+      const { backfillUserActivities } = await import('@/lib/strava/backfill')
+      const { data: userComps } = await supabaseAdmin
+        .from('competition_participants')
+        .select('competition_id')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+
+      for (const uc of userComps || []) {
         try {
-          const { backfillUserActivities } = await import('@/lib/strava/backfill')
-          await backfillUserActivities(userId, comp.id)
+          await backfillUserActivities(userId, uc.competition_id)
         } catch (backfillErr) {
-          console.error('Backfill failed (non-blocking):', backfillErr)
+          console.error(`Backfill failed for competition ${uc.competition_id} (non-blocking):`, backfillErr)
         }
       }
+    } catch (backfillErr) {
+      console.error('Backfill setup failed (non-blocking):', backfillErr)
     }
 
     const redirectUrl = existingUser?.is_profile_complete

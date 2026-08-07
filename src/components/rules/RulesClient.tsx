@@ -17,11 +17,11 @@ function fmtRatio(r: number) {
 }
 
 function fmtPaceRange(min: number, max: number, unit: string) {
-  if (unit === 'min/km') {
-    return `Pace ${fmtPace(min)} – ${fmtPace(max)} min/km`
+  if (unit === 'sec/km') {
+    return `Pace ${fmtPace(min)} – ${fmtPace(max)} phút/km`
   }
-  if (unit === 'min/100m') {
-    return `Pace ${fmtPace(min)} – ${fmtPace(max)} min/100m`
+  if (unit === 'sec/100m') {
+    return `Pace ${fmtPace(min)} – ${fmtPace(max)} phút/100m`
   }
   return `Tốc độ ${min.toFixed(1)} – ${max.toFixed(1)} ${unit}`
 }

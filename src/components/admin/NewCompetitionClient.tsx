@@ -105,10 +105,10 @@ export default function NewCompetitionClient() {
   }
 
   const SPORTS_CONFIG: { type: SportType; title: string; icon: string; badgeCls: string; unit: string }[] = [
-    { type: 'Run', title: 'Chạy bộ (Run)', icon: '🏃', badgeCls: 'badge-run', unit: 'min/km' },
-    { type: 'Walk', title: 'Đi bộ (Walk)', icon: '🚶', badgeCls: 'badge-walk', unit: 'min/km' },
+    { type: 'Run', title: 'Chạy bộ (Run)', icon: '🏃', badgeCls: 'badge-run', unit: 'phút/km' },
+    { type: 'Walk', title: 'Đi bộ (Walk)', icon: '🚶', badgeCls: 'badge-walk', unit: 'phút/km' },
     { type: 'Ride', title: 'Đạp xe (Ride)', icon: '🚴', badgeCls: 'badge-ride', unit: 'km/h' },
-    { type: 'Swim', title: 'Bơi lội (Swim)', icon: '🏊', badgeCls: 'badge-swim', unit: 'min/100m' },
+    { type: 'Swim', title: 'Bơi lội (Swim)', icon: '🏊', badgeCls: 'badge-swim', unit: 'phút/100m' },
   ]
 
   return (

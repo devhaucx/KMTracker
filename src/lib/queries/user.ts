@@ -32,6 +32,7 @@ export async function getMyStats(competitionId: string) {
     .select('*')
     .eq('user_id', user.id)
     .eq('competition_id', competitionId)
+    .eq('sport_type', 'ALL')
 
   return (data || []) as IndividualLeaderboardEntry[]
 }

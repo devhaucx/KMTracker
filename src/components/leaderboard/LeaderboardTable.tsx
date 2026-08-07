@@ -1,7 +1,7 @@
 'use client'
 
 import { IndividualLeaderboardEntry, DepartmentLeaderboardEntry } from '@/lib/supabase/types'
-import { Trophy, Medal, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-react'
+import { Trophy, Medal } from 'lucide-react'
 
 interface Props {
   type: 'individual' | 'department'
@@ -16,16 +16,6 @@ function RankCell({ rank }: { rank: number }) {
   return <span style={{ color: 'var(--text-tertiary)', fontWeight: 600 }}>#{rank}</span>
 }
 
-function RankTrend({ rank }: { rank: number }) {
-  if (rank === 1 || rank === 4) {
-    return <span className="rank-trend-up" title="Tăng 2 hạng"><ArrowUpRight size={14} />+2</span>
-  }
-  if (rank === 3 || rank === 7) {
-    return <span className="rank-trend-down" title="Giảm 1 hạng"><ArrowDownRight size={14} />-1</span>
-  }
-  return <span className="rank-trend-same" title="Giữ nguyên hạng"><Minus size={12} /></span>
-}
-
 function Avatar({ name, url }: { name: string; url?: string | null }) {
   return url
     // eslint-disable-next-line @next/next/no-img-element
@@ -35,8 +25,9 @@ function Avatar({ name, url }: { name: string; url?: string | null }) {
       </div>
 }
 
-const SPORT_CLS: Record<string, string> = { Run: 'badge-run', Walk: 'badge-walk', Ride: 'badge-ride', Swim: 'badge-swim' }
-const SPORT_ICON: Record<string, string> = { Run: '🏃', Walk: '🚶', Ride: '🚴', Swim: '🏊' }
+const SPORT_CLS: Record<string, string> = { Run: 'badge-run', Walk: 'badge-walk', Ride: 'badge-ride', Swim: 'badge-swim', ALL: 'badge-neutral' }
+const SPORT_ICON: Record<string, string> = { Run: '🏃', Walk: '🚶', Ride: '🚴', Swim: '🏊', ALL: '🏆' }
+const SPORT_LABEL: Record<string, string> = { Run: 'Chạy', Walk: 'Đi bộ', Ride: 'Đạp xe', Swim: 'Bơi', ALL: 'Tổng' }
 
 function EmptyRow({ msg }: { msg: string }) {
   return (
@@ -55,7 +46,6 @@ export default function LeaderboardTable({ type, individualEntries = [], departm
               <thead>
                 <tr>
                   <th style={{ width: 64, textAlign: 'center' }}>#</th>
-                  <th style={{ width: 50, textAlign: 'center' }}>Xu hướng</th>
                   <th>Vận động viên</th>
                   <th>Phòng ban</th>
                   <th style={{ textAlign: 'center' }}>Môn</th>
@@ -66,14 +56,13 @@ export default function LeaderboardTable({ type, individualEntries = [], departm
               </thead>
               <tbody>
                 {!individualEntries.length ? (
-                  <tr><td colSpan={8} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-tertiary)' }}>Chưa có dữ liệu.</td></tr>
+                  <tr><td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-tertiary)' }}>Chưa có dữ liệu.</td></tr>
                 ) : (
                   individualEntries.map((item, idx) => {
                     const rank = item.overall_rank || item.rank_by_sport || (idx + 1)
                     return (
                       <tr key={item.user_id + idx} style={rank <= 3 ? { background: 'var(--bg-subtle)' } : {}}>
                         <td style={{ textAlign: 'center' }}><RankCell rank={rank} /></td>
-                        <td style={{ textAlign: 'center' }}><RankTrend rank={rank} /></td>
                         <td>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
                             <Avatar name={item.full_name} url={item.avatar_url} />
@@ -92,7 +81,7 @@ export default function LeaderboardTable({ type, individualEntries = [], departm
                         </td>
                         <td style={{ textAlign: 'center' }}>
                           <span className={`badge ${SPORT_CLS[item.sport_type] ?? 'badge-neutral'}`}>
-                            {SPORT_ICON[item.sport_type]} {item.sport_type}
+                            {SPORT_ICON[item.sport_type]} {SPORT_LABEL[item.sport_type] || item.sport_type}
                           </span>
                         </td>
                         <td style={{ textAlign: 'center', color: 'var(--text-secondary)', fontWeight: 500 }}>{item.activity_count}</td>
@@ -148,7 +137,6 @@ export default function LeaderboardTable({ type, individualEntries = [], departm
                     <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--color-primary)' }}>
                       {item.total_converted_km.toFixed(1)} <span style={{ fontSize: '0.7rem', color: 'var(--text-tertiary)' }}>km</span>
                     </div>
-                    <RankTrend rank={rank} />
                   </div>
                 </div>
               )
